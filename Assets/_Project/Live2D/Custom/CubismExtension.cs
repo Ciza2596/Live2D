@@ -1,9 +1,9 @@
-using Live2D.Cubism.Core;
 using Live2D.Cubism.Framework;
+using Live2D.Cubism.Rendering;
 using Live2D.Cubism.Rendering.Masking;
 using UnityEngine;
 
-namespace Live2D.Cubism.Rendering
+namespace Live2D.Cubism.Core
 {
 	public static class CubismExtension
 	{

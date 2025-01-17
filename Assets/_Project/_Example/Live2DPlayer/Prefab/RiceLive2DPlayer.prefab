@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1829162442211011628}
-  - component: {fileID: 4359048646772943998}
+  - component: {fileID: 8045093284703544251}
   m_Layer: 0
   m_Name: RiceLive2DPlayer
   m_TagString: Untagged
@@ -33,7 +33,7 @@ Transform:
   - {fileID: 2264549373570925398}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4359048646772943998
+--- !u!114 &8045093284703544251
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -42,11 +42,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 2135112528581231008}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 33fc96b736df4450fa984a8cd41bb8f9, type: 3}
+  m_Script: {fileID: 11500000, guid: 32ec9711a1e334fb1b080d1d3a1591a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _state: mtn_01
-  _normalized: 1
+  _normalized: 0.418
   _sortingMode: 2
 --- !u!1001 &8972280078315656172
 PrefabInstance:

@@ -5,11 +5,11 @@ using UnityEngine;
 public class Live2DPlayer : MonoBehaviour
 {
 	[SerializeField]
-	protected string _state = "mtn_01";
+	protected string _state;
 
 	[Range(0, 1)]
 	[SerializeField]
-	protected float _normalized = 1;
+	protected float _normalized;
 
 	[Space]
 	[SerializeField]
