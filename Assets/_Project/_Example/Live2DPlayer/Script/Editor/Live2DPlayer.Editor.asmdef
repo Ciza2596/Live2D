@@ -1,0 +1,16 @@
+{
+    "name": "Live2DPlayer.Editor",
+    "rootNamespace": "",
+    "references": [
+        "Live2DPlayer"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
