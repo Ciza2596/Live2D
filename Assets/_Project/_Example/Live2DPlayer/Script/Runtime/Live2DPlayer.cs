@@ -13,7 +13,7 @@ public class Live2DPlayer : MonoBehaviour
 
 	[Space]
 	[SerializeField]
-	protected CubismSortingMode _sortingMode = CubismSortingMode.BackToFrontOrder;
+	protected CubismSortingMode _sortingMode = CubismSortingMode.BackToFrontZ;
 
 	protected Animator Animator => GetComponentInChildren<Animator>();
 

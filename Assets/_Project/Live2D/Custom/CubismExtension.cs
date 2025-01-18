@@ -7,7 +7,7 @@ namespace Live2D.Cubism.Core
 {
 	public static class CubismExtension
 	{
-		public static void InitializeWithDisableAll(this CubismModel model, CubismSortingMode sortingMode = CubismSortingMode.BackToFrontOrder)
+		public static void InitializeWithDisableAll(this CubismModel model, CubismSortingMode sortingMode = CubismSortingMode.BackToFrontZ)
 		{
 			foreach (var live2DBehaviour in model.GetComponentsInChildren<Behaviour>())
 				live2DBehaviour.enabled = false;

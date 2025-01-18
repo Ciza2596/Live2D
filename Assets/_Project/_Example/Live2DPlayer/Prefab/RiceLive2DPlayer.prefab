@@ -47,7 +47,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _state: mtn_01
   _normalized: 0.418
-  _sortingMode: 2
+  _sortingMode: 0
 --- !u!1001 &8972280078315656172
 PrefabInstance:
   m_ObjectHideFlags: 0
