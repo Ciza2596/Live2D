@@ -2,6 +2,7 @@ using Live2D.Cubism.Framework;
 using Live2D.Cubism.Rendering;
 using Live2D.Cubism.Rendering.Masking;
 using UnityEngine;
+using UnityEngine.Profiling;
 
 namespace Live2D.Cubism.Core
 {
@@ -36,20 +37,32 @@ namespace Live2D.Cubism.Core
 
 		public static void OnUpdate(this CubismModel model)
 		{
+			Profiler.BeginSample("Cubism.OnUpdate");
 			model.ForceUpdateNow();
+			Profiler.EndSample();
 		}
 
 		public static void OnLateUpdate(this CubismModel model)
 		{
+			Profiler.BeginSample("Cubism.OnLateUpdate");
+			Profiler.BeginSample("RenderController.OnLateUpdate");
 			model.GetComponentInChildren<CubismRenderController>().OnLateUpdate();
+			Profiler.EndSample();
+			Profiler.BeginSample("MaskController.OnLateUpdate");
 			model.GetComponentInChildren<CubismMaskController>()?.OnLateUpdate();
+			Profiler.EndSample();
+			Profiler.BeginSample("UpdateController.OnLateUpdate");
 			model.GetComponentInChildren<CubismUpdateController>()?.LateUpdate();
+			Profiler.EndSample();
+			Profiler.EndSample();
 		}
 
 		public static void Refresh(this CubismModel model)
 		{
+			Profiler.BeginSample("Cubism.Refresh");
 			model.OnUpdate();
 			model.OnLateUpdate();
+			Profiler.EndSample();
 		}
 	}
 }
