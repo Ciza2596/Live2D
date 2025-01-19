@@ -22,7 +22,6 @@ namespace Live2D.Cubism.Core
 			renderController.SortingMode = sortingMode;
 
 			var maskController = model.GetComponentInChildren<CubismMaskController>();
-			maskController.HasUpdateController = model.GetComponentInChildren<CubismUpdateController>();
 			maskController?.MaskTexture?.AddSource(maskController);
 			model.GetComponentInChildren<CubismUpdateController>()?.Refresh();
 		}
@@ -34,9 +33,6 @@ namespace Live2D.Cubism.Core
 
 			model.OnDynamicDrawableData -= model.GetComponentInChildren<CubismRenderController>().OnDynamicDrawableData;
 		}
-		
-		public static void SetSortingMode(this CubismModel model, CubismSortingMode sortingMode) =>
-			model.GetComponentInChildren<CubismRenderController>().SortingMode = sortingMode;
 
 		public static void OnUpdate(this CubismModel model)
 		{
