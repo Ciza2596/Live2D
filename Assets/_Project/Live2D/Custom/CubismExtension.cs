@@ -25,13 +25,16 @@ namespace Live2D.Cubism.Core
 			var maskController = model.GetComponentInChildren<CubismMaskController>();
 			maskController?.MaskTexture?.AddSource(maskController);
 			model.GetComponentInChildren<CubismUpdateController>()?.Refresh();
+			
+			model.OnEnable();
 		}
 
 		public static void Release(this CubismModel model)
 		{
+			model.OnDisable();
+			
 			var maskController = model.GetComponentInChildren<CubismMaskController>();
 			maskController?.MaskTexture?.RemoveSource(maskController);
-
 			model.OnDynamicDrawableData -= model.GetComponentInChildren<CubismRenderController>().OnDynamicDrawableData;
 		}
 
@@ -40,6 +43,10 @@ namespace Live2D.Cubism.Core
 			Profiler.BeginSample("Cubism.OnUpdate");
 			model.ForceUpdateNow();
 			Profiler.EndSample();
+			
+			// Profiler.BeginSample("Cubism.OnUpdate");
+			// model.Update();
+			// Profiler.EndSample();
 		}
 
 		public static void OnLateUpdate(this CubismModel model)

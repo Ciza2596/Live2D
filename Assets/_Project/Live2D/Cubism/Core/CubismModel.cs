@@ -9,6 +9,7 @@
 using Live2D.Cubism.Framework;
 using System;
 using UnityEngine;
+using UnityEngine.Profiling;
 #if UNITY_2019_3_OR_NEWER
 using UnityEngine.LowLevel;
 using UnityEngine.PlayerLoop;
@@ -341,10 +342,14 @@ namespace Live2D.Cubism.Core
             LastTick = -1;
 
 
+            Profiler.BeginSample("Revive");
             Revive();
+            Profiler.EndSample();
 
 #if UNITY_2018_1_OR_NEWER
+            Profiler.BeginSample("OnModelUpdate");
             OnModelUpdate();
+            Profiler.EndSample();
 #else
             OnRenderObject();
 #endif
@@ -446,7 +451,7 @@ namespace Live2D.Cubism.Core
         /// <summary>
         /// Called by Unity. Triggers <see langword="this"/> to update.
         /// </summary>
-        private void Update()
+        public void Update()
         {
 #if UNITY_2018_1_OR_NEWER
             if (!WasAttachedModelUpdateFunction)
@@ -569,7 +574,7 @@ namespace Live2D.Cubism.Core
         /// <summary>
         /// Called by Unity. Revives instance.
         /// </summary>
-        private void OnEnable()
+        public void OnEnable()
         {
             WasJustEnabled = true;
 
@@ -577,7 +582,7 @@ namespace Live2D.Cubism.Core
             Revive();
         }
 
-        private void OnDisable()
+        public void OnDisable()
         {
 #if UNITY_2018_1_OR_NEWER
             if (WasAttachedModelUpdateFunction)
