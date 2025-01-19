@@ -55,11 +55,6 @@ public class Live2DPlayer : MonoBehaviour
 	{
 		Animator.Play(state, 0, normalized);
 		Animator.Update(0);
-		CubismModel.Tick();
-	}
-
-	protected virtual void LateUpdate()
-	{
-		CubismModel.OnLateUpdate();
+		CubismModel.Refresh();
 	}
 }
