@@ -22,6 +22,7 @@ namespace Live2D.Cubism.Core
 			renderController.SortingMode = sortingMode;
 
 			var maskController = model.GetComponentInChildren<CubismMaskController>();
+			maskController.HasUpdateController = model.GetComponentInChildren<CubismUpdateController>();
 			maskController?.MaskTexture?.AddSource(maskController);
 			model.GetComponentInChildren<CubismUpdateController>()?.Refresh();
 		}
