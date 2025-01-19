@@ -1,3 +1,4 @@
+using System;
 using Live2D.Cubism.Core;
 using Live2D.Cubism.Rendering;
 using UnityEngine;
@@ -54,6 +55,11 @@ public class Live2DPlayer : MonoBehaviour
 	{
 		Animator.Play(state, 0, normalized);
 		Animator.Update(0);
-		CubismModel.Refresh();
+		CubismModel.Tick();
+	}
+
+	protected virtual void LateUpdate()
+	{
+		CubismModel.OnLateUpdate();
 	}
 }

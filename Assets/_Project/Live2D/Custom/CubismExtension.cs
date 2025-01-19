@@ -34,10 +34,13 @@ namespace Live2D.Cubism.Core
 			model.OnDynamicDrawableData -= model.GetComponentInChildren<CubismRenderController>().OnDynamicDrawableData;
 		}
 
-		public static void Refresh(this CubismModel model)
+		public static void Tick(this CubismModel model)
 		{
 			model.ForceUpdateNow();
-			model.RefreshParameterStore();
+		}
+
+		public static void OnLateUpdate(this CubismModel model)
+		{
 			model.GetComponentInChildren<CubismRenderController>().OnLateUpdate();
 			model.GetComponentInChildren<CubismMaskController>()?.OnLateUpdate();
 			model.GetComponentInChildren<CubismUpdateController>()?.LateUpdate();
