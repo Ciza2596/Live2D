@@ -17,25 +17,35 @@ namespace Live2D.Cubism.Core
 
 		public static void Initialize(this CubismModel model, CubismSortingMode sortingMode)
 		{
-			var renderController = model.GetComponentInChildren<CubismRenderController>();
-			model.OnDynamicDrawableData += renderController.OnDynamicDrawableData;
-			renderController.TryInitializeRenderers();
-			renderController.SortingMode = sortingMode;
+			model.GetComponentInChildren<CubismRenderController>().SortingMode = sortingMode;
+			model.IsAttachedModelUpdate = false;
 
-			var maskController = model.GetComponentInChildren<CubismMaskController>();
-			maskController?.MaskTexture?.AddSource(maskController);
-			model.GetComponentInChildren<CubismUpdateController>()?.Refresh();
-			
+			// Awake
+			foreach (var awakable in model.GetComponentsInChildren<IAwakable>())
+				awakable.OnAwake();
+
+			// OnEnable
+			foreach (var enable in model.GetComponentsInChildren<IEnable>())
+				enable.Enable();
+
+			// Reset
+			foreach (var resetable in model.GetComponentsInChildren<IResetable>())
+				resetable.OnReset();
+
+			// Start
+			foreach (var startable in model.GetComponentsInChildren<IStartable>())
+				startable.OnStart();
+
 			model.OnEnable();
 		}
 
 		public static void Release(this CubismModel model)
 		{
 			model.OnDisable();
-			
-			var maskController = model.GetComponentInChildren<CubismMaskController>();
-			maskController?.MaskTexture?.RemoveSource(maskController);
-			model.OnDynamicDrawableData -= model.GetComponentInChildren<CubismRenderController>().OnDynamicDrawableData;
+
+			// Disable
+			foreach (var disable in model.GetComponentsInChildren<IDisable>())
+				disable.Disable();
 		}
 
 		public static void OnUpdate(this CubismModel model)
@@ -43,10 +53,6 @@ namespace Live2D.Cubism.Core
 			Profiler.BeginSample("Cubism.OnUpdate");
 			model.ForceUpdateNow();
 			Profiler.EndSample();
-			
-			// Profiler.BeginSample("Cubism.OnUpdate");
-			// model.Update();
-			// Profiler.EndSample();
 		}
 
 		public static void OnLateUpdate(this CubismModel model)

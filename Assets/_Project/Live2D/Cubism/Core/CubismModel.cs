@@ -235,6 +235,7 @@ namespace Live2D.Cubism.Core
 
         private bool WasAttachedModelUpdateFunction { get; set; }
 #endif
+        public bool IsAttachedModelUpdate { get; set; } = true;
 
 
         /// <summary>
@@ -449,7 +450,7 @@ namespace Live2D.Cubism.Core
         public void Update()
         {
 #if UNITY_2018_1_OR_NEWER
-            if (!WasAttachedModelUpdateFunction)
+            if (IsAttachedModelUpdate && !WasAttachedModelUpdateFunction)
             {
                 _modelUpdateFunctions += OnModelUpdate;
 
