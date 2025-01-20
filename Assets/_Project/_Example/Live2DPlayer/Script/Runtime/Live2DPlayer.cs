@@ -35,6 +35,12 @@ public class Live2DPlayer : MonoBehaviour
 	protected virtual void Update()
 	{
 		SetTime(_state, _normalized);
+		//CubismModel.Update();
+	}
+
+	protected void LateUpdate()
+	{
+		//CubismModel.OnLateUpdate();
 	}
 
 	#endregion
@@ -55,6 +61,5 @@ public class Live2DPlayer : MonoBehaviour
 	{
 		Animator.Play(state, 0, normalized);
 		Animator.Update(0);
-		CubismModel.Refresh();
 	}
 }

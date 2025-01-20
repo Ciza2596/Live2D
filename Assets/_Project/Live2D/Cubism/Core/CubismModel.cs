@@ -341,15 +341,10 @@ namespace Live2D.Cubism.Core
             WasJustEnabled = true;
             LastTick = -1;
 
-
-            Profiler.BeginSample("Revive");
             Revive();
-            Profiler.EndSample();
 
 #if UNITY_2018_1_OR_NEWER
-            Profiler.BeginSample("OnModelUpdate");
             OnModelUpdate();
-            Profiler.EndSample();
 #else
             OnRenderObject();
 #endif
