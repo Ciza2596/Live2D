@@ -17,7 +17,7 @@ namespace Live2D.Cubism.Framework.LookAt
     /// <summary>
     /// Controls <see cref="CubismLookParameter"/>s.
     /// </summary>
-    public sealed class CubismLookController : MonoBehaviour, ICubismUpdatable
+    public sealed class CubismLookController : MonoBehaviour, ILateUpdatable, IStartable
     {
         /// <summary>
         /// Blend mode.
@@ -156,7 +156,7 @@ namespace Live2D.Cubism.Framework.LookAt
         public void OnLateUpdate()
         {
             // Return if it is not valid or there's nothing to update.
-            if (!enabled || Destinations == null)
+            if (/*!enabled || */Destinations == null)
             {
                 return;
             }
@@ -203,7 +203,10 @@ namespace Live2D.Cubism.Framework.LookAt
         /// <summary>
         /// Called by Unity. Makes sure cache is initialized.
         /// </summary>
-        private void Start()
+        private void Start() =>
+            OnStart();
+        
+        public void OnStart()
         {
             // Default center if necessary.
             if (Center == null)
@@ -229,5 +232,6 @@ namespace Live2D.Cubism.Framework.LookAt
         }
 
         #endregion
+        
     }
 }

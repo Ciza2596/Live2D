@@ -27,12 +27,12 @@ namespace Live2D.Cubism.Framework
         public static readonly int CubismRenderController = 10000;
         public static readonly int CubismMaskController = 10100;
 
-        public static void SortByExecutionOrder(List<ICubismUpdatable> updatables)
+        public static void SortByExecutionOrder(List<ILateUpdatable> updatables)
         {
             updatables.Sort(CompareByExecutionOrder);
         }
 
-        private static int CompareByExecutionOrder(ICubismUpdatable a, ICubismUpdatable b)
+        private static int CompareByExecutionOrder(ILateUpdatable a, ILateUpdatable b)
         {
             return a.ExecutionOrder - b.ExecutionOrder;
         }

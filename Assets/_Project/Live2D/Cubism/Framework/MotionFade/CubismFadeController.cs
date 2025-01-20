@@ -17,7 +17,7 @@ namespace Live2D.Cubism.Framework.MotionFade
     /// Cubism fade controller.
     /// </summary>
     [RequireComponent(typeof(Animator))]
-    public class CubismFadeController : MonoBehaviour, ICubismUpdatable
+    public class CubismFadeController : MonoBehaviour, ILateUpdatable, IEnable
     {
         #region Variable
 
@@ -132,7 +132,7 @@ namespace Live2D.Cubism.Framework.MotionFade
         public void OnLateUpdate()
         {
             // Fail silently.
-            if (!enabled || _fadeStates == null || _parameterStore == null
+            if (/*!enabled || */_fadeStates == null || _parameterStore == null
                || DestinationParameters == null || DestinationParts == null)
             {
                 return;
@@ -410,7 +410,13 @@ namespace Live2D.Cubism.Framework.MotionFade
         /// <summary>
         /// Initializes instance.
         /// </summary>
-        private void OnEnable()
+        private void OnEnable() =>
+            Enable();
+        
+        /// <summary>
+        /// Initializes instance.
+        /// </summary>
+        public void Enable()
         {
             // Initialize cache.
             Refresh();
@@ -428,5 +434,6 @@ namespace Live2D.Cubism.Framework.MotionFade
         }
 
         #endregion
+        
     }
 }

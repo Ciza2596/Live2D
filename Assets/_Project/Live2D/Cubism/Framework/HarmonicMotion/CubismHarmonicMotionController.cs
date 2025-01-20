@@ -12,149 +12,151 @@ using UnityEngine;
 
 namespace Live2D.Cubism.Framework.HarmonicMotion
 {
-    /// <summary>
-    /// Controller for <see cref="CubismHarmonicMotionParameter"/>s.
-    /// </summary>
-    public sealed class CubismHarmonicMotionController : MonoBehaviour, ICubismUpdatable
-    {
-        /// <summary>
-        /// Default number of channels.
-        /// </summary>
-        private const int DefaultChannelCount = 1;
+	/// <summary>
+	/// Controller for <see cref="CubismHarmonicMotionParameter"/>s.
+	/// </summary>
+	public sealed class CubismHarmonicMotionController : MonoBehaviour, ILateUpdatable, IStartable, IResetable
+	{
+		/// <summary>
+		/// Default number of channels.
+		/// </summary>
+		private const int DefaultChannelCount = 1;
 
 
-        /// <summary>
-        /// Blend mode.
-        /// </summary>
-        [SerializeField]
-        public CubismParameterBlendMode BlendMode = CubismParameterBlendMode.Additive;
+		/// <summary>
+		/// Blend mode.
+		/// </summary>
+		[SerializeField]
+		public CubismParameterBlendMode BlendMode = CubismParameterBlendMode.Additive;
 
 
-        /// <summary>
-        /// The timescales for each channel.
-        /// </summary>
-        [SerializeField]
-        public float[] ChannelTimescales;
+		/// <summary>
+		/// The timescales for each channel.
+		/// </summary>
+		[SerializeField]
+		public float[] ChannelTimescales;
 
 
-        /// <summary>
-        /// Sources.
-        /// </summary>
-        private CubismHarmonicMotionParameter[] Sources { get; set; }
+		/// <summary>
+		/// Sources.
+		/// </summary>
+		private CubismHarmonicMotionParameter[] Sources { get; set; }
 
-        /// <summary>
-        /// Destinations.
-        /// </summary>
-        private CubismParameter[] Destinations { get; set; }
+		/// <summary>
+		/// Destinations.
+		/// </summary>
+		private CubismParameter[] Destinations { get; set; }
 
-        /// <summary>
-        /// Model has update controller component.
-        /// </summary>
-        [HideInInspector]
-        public bool HasUpdateController { get; set; }
-
-
-        /// <summary>
-        /// Refreshes the controller. Call this method after adding and/or removing <see cref="CubismHarmonicMotionParameter"/>.
-        /// </summary>
-        public void Refresh()
-        {
-            var model = this.FindCubismModel();
+		/// <summary>
+		/// Model has update controller component.
+		/// </summary>
+		[HideInInspector]
+		public bool HasUpdateController { get; set; }
 
 
-            // Catch sources and destinations.
-            Sources = model
-                .Parameters
-                .GetComponentsMany<CubismHarmonicMotionParameter>();
-            Destinations = new CubismParameter[Sources.Length];
+		/// <summary>
+		/// Refreshes the controller. Call this method after adding and/or removing <see cref="CubismHarmonicMotionParameter"/>.
+		/// </summary>
+		public void Refresh()
+		{
+			var model = this.FindCubismModel();
 
 
-            for (var i = 0; i < Sources.Length; ++i)
-            {
-                Destinations[i] = Sources[i].GetComponent<CubismParameter>();
-            }
-
-            // Get cubism update controller.
-            HasUpdateController = (GetComponent<CubismUpdateController>() != null);
-        }
-
-        /// <summary>
-        /// Called by cubism update controller. Order to invoke OnLateUpdate.
-        /// </summary>
-        public int ExecutionOrder
-        {
-            get { return CubismUpdateExecutionOrder.CubismHarmonicMotionController; }
-        }
-
-        /// <summary>
-        /// Called by cubism update controller. Needs to invoke OnLateUpdate on Editing.
-        /// </summary>
-        public bool NeedsUpdateOnEditing
-        {
-            get { return false; }
-        }
-
-        /// <summary>
-        /// Called by cubism update controller. Updates controller.
-        /// </summary>
-        public void OnLateUpdate()
-        {
-            // Return if it is not valid or there's nothing to update.
-            if (!enabled || Sources == null)
-            {
-                return;
-            }
+			// Catch sources and destinations.
+			Sources = model.Parameters.GetComponentsMany<CubismHarmonicMotionParameter>();
+			Destinations = new CubismParameter[Sources.Length];
 
 
-            // Update sources and destinations.
-            for (var i = 0; i < Sources.Length; ++i)
-            {
-                Sources[i].Play(ChannelTimescales);
+			for (var i = 0; i < Sources.Length; ++i)
+			{
+				Destinations[i] = Sources[i].GetComponent<CubismParameter>();
+			}
+
+			// Get cubism update controller.
+			HasUpdateController = (GetComponent<CubismUpdateController>() != null);
+		}
+
+		/// <summary>
+		/// Called by cubism update controller. Order to invoke OnLateUpdate.
+		/// </summary>
+		public int ExecutionOrder
+		{
+			get { return CubismUpdateExecutionOrder.CubismHarmonicMotionController; }
+		}
+
+		/// <summary>
+		/// Called by cubism update controller. Needs to invoke OnLateUpdate on Editing.
+		/// </summary>
+		public bool NeedsUpdateOnEditing
+		{
+			get { return false; }
+		}
+
+		/// <summary>
+		/// Called by cubism update controller. Updates controller.
+		/// </summary>
+		public void OnLateUpdate()
+		{
+			// Return if it is not valid or there's nothing to update.
+			if (/*!enabled || */Sources == null)
+			{
+				return;
+			}
 
 
-                Destinations[i].BlendToValue(BlendMode, Sources[i].Evaluate());
-            }
-        }
-
-        #region Unity Events Handling
-
-        /// <summary>
-        /// Called by Unity. Makes sure cache is initialized.
-        /// </summary>
-        private void Start()
-        {
-            // Initialize cache.
-            Refresh();
-        }
+			// Update sources and destinations.
+			for (var i = 0; i < Sources.Length; ++i)
+			{
+				Sources[i].Play(ChannelTimescales);
 
 
-        /// <summary>
-        /// Called by Unity. Updates controller.
-        /// </summary>
-        private void LateUpdate()
-        {
-            if (!HasUpdateController)
-            {
-                OnLateUpdate();
-            }
-        }
+				Destinations[i].BlendToValue(BlendMode, Sources[i].Evaluate());
+			}
+		}
+
+		#region Unity Events Handling
+
+		/// <summary>
+		/// Called by Unity. Resets channels.
+		/// </summary>
+		private void Reset() =>
+			OnReset();
+
+		public void OnReset()
+		{
+			// Reset/Initialize channel timescales.
+			ChannelTimescales = new float[DefaultChannelCount];
+
+			for (var s = 0; s < DefaultChannelCount; ++s)
+			{
+				ChannelTimescales[s] = 1f;
+			}
+		}
+		
+		private void Start() =>
+			OnStart();
+		
+		/// <summary>
+		/// Called by Unity. Makes sure cache is initialized.
+		/// </summary>
+		public void OnStart()
+		{
+			// Initialize cache.
+			Refresh();
+		}
 
 
-        /// <summary>
-        /// Called by Unity. Resets channels.
-        /// </summary>
-        private void Reset()
-        {
-            // Reset/Initialize channel timescales.
-            ChannelTimescales = new float[DefaultChannelCount];
+		/// <summary>
+		/// Called by Unity. Updates controller.
+		/// </summary>
+		private void LateUpdate()
+		{
+			if (!HasUpdateController)
+			{
+				OnLateUpdate();
+			}
+		}
 
-
-            for (var s = 0; s < DefaultChannelCount; ++s)
-            {
-                ChannelTimescales[s] = 1f;
-            }
-        }
-
-        #endregion
-    }
+		#endregion
+	}
 }

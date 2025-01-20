@@ -14,7 +14,7 @@ namespace Live2D.Cubism.Framework
     /// <summary>
     /// Cubism parameter store.
     /// </summary>
-    public class CubismParameterStore : MonoBehaviour, ICubismUpdatable
+    public class CubismParameterStore : MonoBehaviour, ILateUpdatable
     {
         /// <summary>
         /// Parameters cache.

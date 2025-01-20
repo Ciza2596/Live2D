@@ -37,8 +37,8 @@ namespace Live2D.Cubism.Framework
             _onLateUpdate = null;
 
             // Set delegate.
-            var components = model.GetComponents<ICubismUpdatable>();
-            var sortedComponents = new List<ICubismUpdatable>(components);
+            var components = model.GetComponents<ILateUpdatable>();
+            var sortedComponents = new List<ILateUpdatable>(components);
             CubismUpdateExecutionOrder.SortByExecutionOrder(sortedComponents);
 
             foreach(var component in sortedComponents)

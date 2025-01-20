@@ -10,7 +10,7 @@ namespace Live2D.Cubism.Framework
     /// <summary>
     /// Cubism update interface.
     /// </summary>
-    public interface ICubismUpdatable
+    public interface ILateUpdatable
     {
         int ExecutionOrder { get; }
         bool NeedsUpdateOnEditing { get; }

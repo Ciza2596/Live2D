@@ -15,7 +15,7 @@ namespace Live2D.Cubism.Framework
     /// <summary>
     /// <see cref="CubismEyeBlinkParameter"/> controller.
     /// </summary>
-    public sealed class CubismEyeBlinkController : MonoBehaviour, ICubismUpdatable
+    public sealed class CubismEyeBlinkController : MonoBehaviour, ILateUpdatable, IStartable
     {
         /// <summary>
         /// Blend mode.
@@ -110,11 +110,14 @@ namespace Live2D.Cubism.Framework
 
         #region Unity Event Handling
 
+        
+        private void Start() =>
+            OnStart();
 
         /// <summary>
         /// Called by Unity. Makes sure cache is initialized.
         /// </summary>
-        private void Start()
+        public void OnStart()
         {
             // Initialize cache.
             Refresh();
