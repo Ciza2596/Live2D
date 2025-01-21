@@ -19,7 +19,7 @@ namespace Live2D.Cubism.Rendering
 	/// Controls rendering of a <see cref="CubismModel"/>.
 	/// </summary>
 	[ExecuteInEditMode, CubismDontMoveOnReimport]
-	public sealed class CubismRenderController : MonoBehaviour, IEnable, IStartable, IDisable, ILateUpdatable
+	public sealed class CubismRenderController : MonoBehaviour, IEnable, /*IStartable, */IDisable, ILateUpdatable
 	{
 		/// <summary>
 		/// Model opacity.
@@ -726,23 +726,23 @@ namespace Live2D.Cubism.Rendering
 		/// <summary>
 		/// Called by Unity.
 		/// </summary>
-		private void Start() =>
-			OnStart();
-
-		public void OnStart()
-		{
-			// Fail silently.
-			if (Model == null)
-			{
-				return;
-			}
-
-			// Make sure renderers are available.
-			TryInitializeRenderers();
-
-			// Register listener.
-			Model.OnDynamicDrawableData += OnDynamicDrawableData;
-		}
+		// private void Start() =>
+		// 	OnStart();
+		//
+		// public void OnStart()
+		// {
+		// 	// Fail silently.
+		// 	if (Model == null)
+		// 	{
+		// 		return;
+		// 	}
+		//
+		// 	// Make sure renderers are available.
+		// 	TryInitializeRenderers();
+		//
+		// 	// Register listener.
+		// 	Model.OnDynamicDrawableData += OnDynamicDrawableData;
+		// }
 
 		/// <summary>
 		/// Called by Unity. Enables listening to render data updates.

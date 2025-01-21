@@ -550,15 +550,11 @@ namespace Live2D.Cubism.Core
                 // Force sync update.
                 TaskableModel.UpdateNow();
 
-
                 // Unset condition.
                 WasJustEnabled = false;
 
-
                 // Fetch results by calling own 'Update()'.
                 Update();
-
-
                 return;
             }
 
