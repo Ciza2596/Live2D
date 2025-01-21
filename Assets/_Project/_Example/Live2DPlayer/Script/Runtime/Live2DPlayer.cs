@@ -1,4 +1,3 @@
-using System;
 using Live2D.Cubism.Core;
 using Live2D.Cubism.Rendering;
 using UnityEngine;
@@ -39,7 +38,7 @@ public class Live2DPlayer : MonoBehaviour
 
 	protected void LateUpdate()
 	{
-		CubismModel.OnLateUpdate();
+		CubismModel.LateTick();
 	}
 
 	#endregion
@@ -59,6 +58,6 @@ public class Live2DPlayer : MonoBehaviour
 	public virtual void SetTime(string state, float normalized)
 	{
 		Animator.Play(state, 0, normalized);
-		CubismModel.Update();
+		CubismModel.Tick();
 	}
 }

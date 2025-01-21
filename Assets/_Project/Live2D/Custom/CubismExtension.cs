@@ -50,19 +50,19 @@ namespace Live2D.Cubism.Core
 				disable.Disable();
 		}
 
-		public static void OnUpdate(this CubismModel model)
+		public static void Tick(this CubismModel model)
 		{
-			Profiler.BeginSample("Cubism.OnUpdate");
-			model.ForceUpdateNow();
+			Profiler.BeginSample("Cubism.Tick");
+			model.Update();
 			Profiler.EndSample();
 		}
 
-		public static void OnLateUpdate(this CubismModel model)
+		public static void LateTick(this CubismModel model)
 		{
-			Profiler.BeginSample("Cubism.OnLateUpdate");
+			Profiler.BeginSample("Cubism.LateTick");
 			foreach (var lateUpdatable in model.GetComponentsInChildren<ILateUpdatable>())
 			{
-				Profiler.BeginSample($"{lateUpdatable.GetType().Name}.OnLateUpdate");
+				Profiler.BeginSample($"{lateUpdatable.GetType().Name}.OnLateTick");
 				lateUpdatable.OnLateUpdate();
 				Profiler.EndSample();
 			}
@@ -73,8 +73,8 @@ namespace Live2D.Cubism.Core
 		public static void Refresh(this CubismModel model)
 		{
 			Profiler.BeginSample("Cubism.Refresh");
-			model.OnUpdate();
-			model.OnLateUpdate();
+			model.ForceUpdateNow();
+			model.LateTick();
 			Profiler.EndSample();
 		}
 	}
