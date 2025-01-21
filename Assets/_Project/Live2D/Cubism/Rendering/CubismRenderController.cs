@@ -482,12 +482,12 @@ namespace Live2D.Cubism.Rendering
 		/// <summary>
 		/// multiply color buffer.
 		/// </summary>
-		private Color[] _newMultiplyColors;
+		// private Color[] _newMultiplyColors;
 
 		/// <summary>
 		/// screen color buffer.
 		/// </summary>
-		private Color[] _newScreenColors;
+		// private Color[] _newScreenColors;
 
 
 		/// <summary>
@@ -593,89 +593,89 @@ namespace Live2D.Cubism.Rendering
 		/// <summary>
 		/// Updates Blend Colors if necessary.
 		/// </summary>
-		private void UpdateBlendColors()
-		{
-			if (Renderers == null)
-			{
-				return;
-			}
-
-			var isMultiplyColorUpdated = false;
-			var isScreenColorUpdated = false;
-			_newMultiplyColors ??= new Color[Renderers.Length];
-			_newScreenColors ??= new Color[Renderers.Length];
-
-			for (int i = 0; i < Renderers.Length; i++)
-			{
-				var isUseUserMultiplyColor = (Renderers[i].OverwriteFlagForDrawableMultiplyColors || OverwriteFlagForModelMultiplyColors);
-
-				if (isUseUserMultiplyColor)
-				{
-					// If you switch from a setting that uses the color of the model, revert to the color that was retained.
-					if (!Renderers[i].LastIsUseUserMultiplyColor)
-					{
-						Renderers[i].MultiplyColor = Renderers[i].LastMultiplyColor;
-						Renderers[i].ApplyMultiplyColor();
-						isMultiplyColorUpdated = true;
-					}
-					else if (Renderers[i].LastMultiplyColor != Renderers[i].MultiplyColor)
-					{
-						Renderers[i].ApplyMultiplyColor();
-						isMultiplyColorUpdated = true;
-					}
-
-					Renderers[i].LastMultiplyColor = Renderers[i].MultiplyColor;
-				}
-				else if (Renderers[i].LastIsUseUserMultiplyColor)
-				{
-					Renderers[i].MultiplyColor = Renderers[i].LastMultiplyColor;
-					Renderers[i].ApplyMultiplyColor();
-					isMultiplyColorUpdated = true;
-				}
-
-				_newMultiplyColors[i] = Renderers[i].MultiplyColor;
-				Renderers[i].LastIsUseUserMultiplyColor = isUseUserMultiplyColor;
-
-				var isUseUserScreenColor = (Renderers[i].OverwriteFlagForDrawableScreenColors || OverwriteFlagForModelScreenColors);
-
-				if (isUseUserScreenColor)
-				{
-					// If you switch from a setting that uses the color of the model, revert to the color that was retained.
-					if (!Renderers[i].LastIsUseUserScreenColors)
-					{
-						Renderers[i].ScreenColor = Renderers[i].LastScreenColor;
-						Renderers[i].ApplyScreenColor();
-						isScreenColorUpdated = true;
-					}
-					else if (Renderers[i].LastScreenColor != Renderers[i].ScreenColor)
-					{
-						Renderers[i].ApplyScreenColor();
-						isScreenColorUpdated = true;
-					}
-
-					Renderers[i].LastScreenColor = Renderers[i].ScreenColor;
-				}
-				else if (Renderers[i].LastIsUseUserScreenColors)
-				{
-					Renderers[i].ScreenColor = Renderers[i].LastScreenColor;
-					Renderers[i].ApplyScreenColor();
-					isScreenColorUpdated = true;
-				}
-
-				_newScreenColors[i] = Renderers[i].ScreenColor;
-				Renderers[i].LastIsUseUserScreenColors = isUseUserScreenColor;
-			}
-
-			if (MultiplyColorHandler != null && isMultiplyColorUpdated)
-			{
-				MultiplyColorHandlerInterface.OnBlendColorDidChange(this, _newMultiplyColors);
-			}
-
-			if (ScreenColorHandler != null && isScreenColorUpdated)
-			{
-				ScreenColorHandlerInterface.OnBlendColorDidChange(this, _newScreenColors);
-			}
-		}
+		// private void UpdateBlendColors()
+		// {
+		// 	if (Renderers == null)
+		// 	{
+		// 		return;
+		// 	}
+		//
+		// 	var isMultiplyColorUpdated = false;
+		// 	var isScreenColorUpdated = false;
+		// 	//_newMultiplyColors ??= new Color[Renderers.Length];
+		// 	//_newScreenColors ??= new Color[Renderers.Length];
+		//
+		// 	for (int i = 0; i < Renderers.Length; i++)
+		// 	{
+		// 		var isUseUserMultiplyColor = (Renderers[i].OverwriteFlagForDrawableMultiplyColors || OverwriteFlagForModelMultiplyColors);
+		//
+		// 		if (isUseUserMultiplyColor)
+		// 		{
+		// 			// If you switch from a setting that uses the color of the model, revert to the color that was retained.
+		// 			if (!Renderers[i].LastIsUseUserMultiplyColor)
+		// 			{
+		// 				Renderers[i].MultiplyColor = Renderers[i].LastMultiplyColor;
+		// 				Renderers[i].ApplyMultiplyColor();
+		// 				isMultiplyColorUpdated = true;
+		// 			}
+		// 			else if (Renderers[i].LastMultiplyColor != Renderers[i].MultiplyColor)
+		// 			{
+		// 				Renderers[i].ApplyMultiplyColor();
+		// 				isMultiplyColorUpdated = true;
+		// 			}
+		//
+		// 			Renderers[i].LastMultiplyColor = Renderers[i].MultiplyColor;
+		// 		}
+		// 		else if (Renderers[i].LastIsUseUserMultiplyColor)
+		// 		{
+		// 			Renderers[i].MultiplyColor = Renderers[i].LastMultiplyColor;
+		// 			Renderers[i].ApplyMultiplyColor();
+		// 			isMultiplyColorUpdated = true;
+		// 		}
+		//
+		// 		_newMultiplyColors[i] = Renderers[i].MultiplyColor;
+		// 		Renderers[i].LastIsUseUserMultiplyColor = isUseUserMultiplyColor;
+		//
+		// 		var isUseUserScreenColor = (Renderers[i].OverwriteFlagForDrawableScreenColors || OverwriteFlagForModelScreenColors);
+		//
+		// 		if (isUseUserScreenColor)
+		// 		{
+		// 			// If you switch from a setting that uses the color of the model, revert to the color that was retained.
+		// 			if (!Renderers[i].LastIsUseUserScreenColors)
+		// 			{
+		// 				Renderers[i].ScreenColor = Renderers[i].LastScreenColor;
+		// 				Renderers[i].ApplyScreenColor();
+		// 				isScreenColorUpdated = true;
+		// 			}
+		// 			else if (Renderers[i].LastScreenColor != Renderers[i].ScreenColor)
+		// 			{
+		// 				Renderers[i].ApplyScreenColor();
+		// 				isScreenColorUpdated = true;
+		// 			}
+		//
+		// 			Renderers[i].LastScreenColor = Renderers[i].ScreenColor;
+		// 		}
+		// 		else if (Renderers[i].LastIsUseUserScreenColors)
+		// 		{
+		// 			Renderers[i].ScreenColor = Renderers[i].LastScreenColor;
+		// 			Renderers[i].ApplyScreenColor();
+		// 			isScreenColorUpdated = true;
+		// 		}
+		//
+		// 		_newScreenColors[i] = Renderers[i].ScreenColor;
+		// 		Renderers[i].LastIsUseUserScreenColors = isUseUserScreenColor;
+		// 	}
+		//
+		// 	if (MultiplyColorHandler != null && isMultiplyColorUpdated)
+		// 	{
+		// 		MultiplyColorHandlerInterface.OnBlendColorDidChange(this, _newMultiplyColors);
+		// 	}
+		//
+		// 	if (ScreenColorHandler != null && isScreenColorUpdated)
+		// 	{
+		// 		ScreenColorHandlerInterface.OnBlendColorDidChange(this, _newScreenColors);
+		// 	}
+		// }
 
 		/// <summary>
 		/// Called by cubism update controller. Order to invoke OnLateUpdate.
@@ -708,7 +708,7 @@ namespace Live2D.Cubism.Rendering
 			UpdateOpacity();
 
 			// Updates Blend Colors if necessary.
-			UpdateBlendColors();
+			// UpdateBlendColors();
 
 			// Return early in case no camera is to be faced.
 			if (CameraToFace == null)
@@ -895,54 +895,54 @@ namespace Live2D.Cubism.Rendering
 				}
 			}
 
-			var isMultiplyColorUpdated = false;
-			var isScreenColorUpdated = false;
-			_newMultiplyColors ??= new Color[Renderers.Length];
-			_newScreenColors ??= new Color[Renderers.Length];
-			var newMultiplyColors = _newMultiplyColors;
-			var newScreenColors = _newScreenColors;
-
-			for (var i = 0; i < data.Length; ++i)
-			{
-				var isUseModelMultiplyColor = !(renderers[i].OverwriteFlagForDrawableMultiplyColors || OverwriteFlagForModelMultiplyColors);
-
-				// Skip processing when not using model colors.
-				if (data[i].IsBlendColorDirty && isUseModelMultiplyColor)
-				{
-					renderers[i].ApplyMultiplyColor();
-					isMultiplyColorUpdated = true;
-				}
-
-				newMultiplyColors[i] = renderers[i].MultiplyColor;
-			}
-
-			for (var i = 0; i < data.Length; ++i)
-			{
-				var isUseModelScreenColor = !(renderers[i].OverwriteFlagForDrawableScreenColors || OverwriteFlagForModelScreenColors);
-
-				// Skip processing when not using model colors.
-				if (data[i].IsBlendColorDirty && isUseModelScreenColor)
-				{
-					renderers[i].ApplyScreenColor();
-					isScreenColorUpdated = true;
-				}
-
-				newScreenColors[i] = renderers[i].ScreenColor;
-			}
-
-			// Pass blend color changes to handler (if available).
-			var multiplyColorHandlerInterface = MultiplyColorHandlerInterface;
-			var screenColorHandlerInterface = ScreenColorHandlerInterface;
-
-			if (MultiplyColorHandler != null && isMultiplyColorUpdated)
-			{
-				multiplyColorHandlerInterface.OnBlendColorDidChange(this, newMultiplyColors);
-			}
-
-			if (ScreenColorHandler != null && isScreenColorUpdated)
-			{
-				screenColorHandlerInterface.OnBlendColorDidChange(this, newScreenColors);
-			}
+			// var isMultiplyColorUpdated = false;
+			// var isScreenColorUpdated = false;
+			// _newMultiplyColors ??= new Color[Renderers.Length];
+			// _newScreenColors ??= new Color[Renderers.Length];
+			// var newMultiplyColors = _newMultiplyColors;
+			// var newScreenColors = _newScreenColors;
+			//
+			// for (var i = 0; i < data.Length; ++i)
+			// {
+			// 	var isUseModelMultiplyColor = !(renderers[i].OverwriteFlagForDrawableMultiplyColors || OverwriteFlagForModelMultiplyColors);
+			//
+			// 	// Skip processing when not using model colors.
+			// 	if (data[i].IsBlendColorDirty && isUseModelMultiplyColor)
+			// 	{
+			// 		renderers[i].ApplyMultiplyColor();
+			// 		isMultiplyColorUpdated = true;
+			// 	}
+			//
+			// 	newMultiplyColors[i] = renderers[i].MultiplyColor;
+			// }
+			//
+			// for (var i = 0; i < data.Length; ++i)
+			// {
+			// 	var isUseModelScreenColor = !(renderers[i].OverwriteFlagForDrawableScreenColors || OverwriteFlagForModelScreenColors);
+			//
+			// 	// Skip processing when not using model colors.
+			// 	if (data[i].IsBlendColorDirty && isUseModelScreenColor)
+			// 	{
+			// 		renderers[i].ApplyScreenColor();
+			// 		isScreenColorUpdated = true;
+			// 	}
+			//
+			// 	newScreenColors[i] = renderers[i].ScreenColor;
+			// }
+			//
+			// // Pass blend color changes to handler (if available).
+			// var multiplyColorHandlerInterface = MultiplyColorHandlerInterface;
+			// var screenColorHandlerInterface = ScreenColorHandlerInterface;
+			//
+			// if (MultiplyColorHandler != null && isMultiplyColorUpdated)
+			// {
+			// 	multiplyColorHandlerInterface.OnBlendColorDidChange(this, newMultiplyColors);
+			// }
+			//
+			// if (ScreenColorHandler != null && isScreenColorUpdated)
+			// {
+			// 	screenColorHandlerInterface.OnBlendColorDidChange(this, newScreenColors);
+			// }
 		}
 
 		#endregion
