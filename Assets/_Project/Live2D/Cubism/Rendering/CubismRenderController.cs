@@ -10,6 +10,7 @@ using Live2D.Cubism.Core;
 using Live2D.Cubism.Framework;
 using System;
 using UnityEngine;
+using UnityEngine.Profiling;
 using Object = UnityEngine.Object;
 
 
@@ -805,6 +806,7 @@ namespace Live2D.Cubism.Rendering
 		/// <param name="data">New render data.</param>
 		public void OnDynamicDrawableData(CubismModel sender, CubismDynamicDrawableData[] data)
 		{
+			Profiler.BeginSample("OnDynamicDrawableData");
 			// Get drawables.
 			var drawables = sender.Drawables;
 			var renderers = Renderers;
@@ -818,11 +820,15 @@ namespace Live2D.Cubism.Rendering
 
 
 				// Update visibility if last SwapInfo flag is true.
+				Profiler.BeginSample("UpdateVisibility");
 				renderers[i].UpdateVisibility();
+				Profiler.EndSample();
 
 
 				// Update render order if last SwapInfo flags is true.
+				Profiler.BeginSample("UpdateRenderOrder");
 				renderers[i].UpdateRenderOrder();
+				Profiler.EndSample();
 
 
 				// Skip completely non-dirty data.
@@ -835,7 +841,9 @@ namespace Live2D.Cubism.Rendering
 				// Update visibility.
 				if (data[i].IsVisibilityDirty)
 				{
+					Profiler.BeginSample("OnDrawableVisiblityDidChange");
 					renderers[i].OnDrawableVisiblityDidChange(data[i].IsVisible);
+					Profiler.EndSample();
 
 					swapMeshes = true;
 				}
@@ -844,8 +852,9 @@ namespace Live2D.Cubism.Rendering
 				// Update render order.
 				if (data[i].IsRenderOrderDirty)
 				{
+					Profiler.BeginSample("OnDrawableRenderOrderDidChange");
 					renderers[i].OnDrawableRenderOrderDidChange(data[i].RenderOrder);
-
+					Profiler.EndSample();
 
 					swapMeshes = true;
 				}
@@ -854,8 +863,9 @@ namespace Live2D.Cubism.Rendering
 				// Update opacity.
 				if (data[i].IsOpacityDirty)
 				{
+					Profiler.BeginSample("OnDrawableOpacityDidChange");
 					renderers[i].OnDrawableOpacityDidChange(data[i].Opacity);
-
+					Profiler.EndSample();
 
 					swapMeshes = true;
 				}
@@ -864,8 +874,9 @@ namespace Live2D.Cubism.Rendering
 				// Update vertex positions.
 				if (data[i].AreVertexPositionsDirty)
 				{
+					Profiler.BeginSample("OnDrawableVertexPositionsDidChange");
 					renderers[i].OnDrawableVertexPositionsDidChange(data[i].VertexPositions);
-
+					Profiler.EndSample();
 
 					swapMeshes = true;
 				}
@@ -875,7 +886,9 @@ namespace Live2D.Cubism.Rendering
 				// [INV] Swapping only half of the meshes might improve performance even. Would that be visually feasible?
 				if (swapMeshes)
 				{
+					Profiler.BeginSample("SwapMeshes");
 					renderers[i].SwapMeshes();
+					Profiler.EndSample();
 				}
 			}
 
@@ -883,6 +896,7 @@ namespace Live2D.Cubism.Rendering
 			// Pass draw order changes to handler (if available).
 			var drawOrderHandler = DrawOrderHandlerInterface;
 
+			Profiler.BeginSample("DrawOrderHandler");
 
 			if (drawOrderHandler != null)
 			{
@@ -894,6 +908,9 @@ namespace Live2D.Cubism.Rendering
 					}
 				}
 			}
+			Profiler.EndSample();
+			
+			Profiler.EndSample();
 
 			// var isMultiplyColorUpdated = false;
 			// var isScreenColorUpdated = false;

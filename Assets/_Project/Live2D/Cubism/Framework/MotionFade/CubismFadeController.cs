@@ -176,6 +176,8 @@ namespace Live2D.Cubism.Framework.MotionFade
                 }
 
                 var playingMotions = _fadeStates[i].GetPlayingMotions();
+                if(playingMotions == null)
+                    continue;
                 for (var j = playingMotions.Count - 2; j >= 0; --j)
                 {
                     var playingMotion = playingMotions[j];

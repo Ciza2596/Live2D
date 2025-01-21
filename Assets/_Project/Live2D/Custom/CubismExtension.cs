@@ -12,13 +12,15 @@ namespace Live2D.Cubism.Core
 		{
 			foreach (var live2DBehaviour in model.GetComponentsInChildren<Behaviour>())
 				live2DBehaviour.enabled = false;
+
+			model.GetComponentInChildren<Animator>().enabled = true;
 			model.Initialize(sortingMode);
 		}
 
 		public static void Initialize(this CubismModel model, CubismSortingMode sortingMode)
 		{
 			model.GetComponentInChildren<CubismRenderController>().SortingMode = sortingMode;
-			model.IsAttachedModelUpdate = false;
+			//model.IsAttachedModelUpdate = false;
 
 			// Awake
 			foreach (var awakable in model.GetComponentsInChildren<IAwakable>())
@@ -58,15 +60,13 @@ namespace Live2D.Cubism.Core
 		public static void OnLateUpdate(this CubismModel model)
 		{
 			Profiler.BeginSample("Cubism.OnLateUpdate");
-			Profiler.BeginSample("RenderController.OnLateUpdate");
-			model.GetComponentInChildren<CubismRenderController>().OnLateUpdate();
-			Profiler.EndSample();
-			Profiler.BeginSample("MaskController.OnLateUpdate");
-			model.GetComponentInChildren<CubismMaskController>()?.OnLateUpdate();
-			Profiler.EndSample();
-			Profiler.BeginSample("UpdateController.OnLateUpdate");
-			model.GetComponentInChildren<CubismUpdateController>()?.LateUpdate();
-			Profiler.EndSample();
+			foreach (var lateUpdatable in model.GetComponentsInChildren<ILateUpdatable>())
+			{
+				Profiler.BeginSample($"{lateUpdatable.GetType().Name}.OnLateUpdate");
+				lateUpdatable.OnLateUpdate();
+				Profiler.EndSample();
+			}
+
 			Profiler.EndSample();
 		}
 
