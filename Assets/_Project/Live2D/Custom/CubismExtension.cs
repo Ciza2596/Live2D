@@ -12,15 +12,14 @@ namespace Live2D.Cubism.Core
 		{
 			foreach (var live2DBehaviour in model.GetComponentsInChildren<Behaviour>())
 				live2DBehaviour.enabled = false;
-
-			model.GetComponentInChildren<Animator>().enabled = true;
+			
 			model.Initialize(sortingMode);
 		}
 
 		public static void Initialize(this CubismModel model, CubismSortingMode sortingMode)
 		{
 			model.GetComponentInChildren<CubismRenderController>().SortingMode = sortingMode;
-			//model.IsAttachedModelUpdate = false;
+			model.IsAttachedModelUpdate = false;
 
 			// Awake
 			foreach (var awakable in model.GetComponentsInChildren<IAwakable>())
@@ -56,6 +55,13 @@ namespace Live2D.Cubism.Core
 			model.Update();
 			Profiler.EndSample();
 		}
+		
+		public static void ForceTick(this CubismModel model)
+		{
+			Profiler.BeginSample("Cubism.ForceTick");
+			model.ForceUpdateNow();
+			Profiler.EndSample();
+		}
 
 		public static void LateTick(this CubismModel model)
 		{
@@ -73,7 +79,7 @@ namespace Live2D.Cubism.Core
 		public static void Refresh(this CubismModel model)
 		{
 			Profiler.BeginSample("Cubism.Refresh");
-			model.ForceUpdateNow();
+			model.ForceTick();
 			model.LateTick();
 			Profiler.EndSample();
 		}
