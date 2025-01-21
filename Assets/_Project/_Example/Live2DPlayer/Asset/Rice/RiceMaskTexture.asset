@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: RiceMaskTexture
   m_EditorClassIdentifier: 
   _size: 1024
-  _subdivisions: 3
+  _subdivisions: 4
   _renderTextureCount: 0
