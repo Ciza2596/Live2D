@@ -36,10 +36,11 @@ public class Live2DPlayer : MonoBehaviour
 		SetTime(_state, _normalized);
 	}
 
-	// protected void LateUpdate()
-	// {
-	// 	CubismModel.Refresh();
-	// }
+	protected void LateUpdate()
+	{
+		// CubismModel.Parameters.FindById("ParamAngleX").Value = 27;
+		// CubismModel.LateTick();
+	}
 
 	#endregion
 
