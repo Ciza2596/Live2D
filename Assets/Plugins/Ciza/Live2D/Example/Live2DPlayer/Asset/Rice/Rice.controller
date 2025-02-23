@@ -131,7 +131,7 @@ AnimatorStateMachine:
   m_EntryPosition: {x: 50, y: 120, z: 0}
   m_ExitPosition: {x: 800, y: 120, z: 0}
   m_ParentStateMachinePosition: {x: 800, y: 20, z: 0}
-  m_DefaultState: {fileID: 8411947615056181236}
+  m_DefaultState: {fileID: -1771601552575721552}
 --- !u!114 &6917963528913560912
 MonoBehaviour:
   m_ObjectHideFlags: 1

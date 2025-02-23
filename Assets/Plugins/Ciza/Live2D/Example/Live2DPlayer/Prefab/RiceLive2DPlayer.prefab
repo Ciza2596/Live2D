@@ -46,6 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32ec9711a1e334fb1b080d1d3a1591a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _isLockedParameter: 0
   _state: mtn_01
   _normalized: 0.418
   _sortingMode: 0

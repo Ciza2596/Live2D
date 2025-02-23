@@ -5,6 +5,10 @@ using UnityEngine;
 public class Live2DPlayer : MonoBehaviour
 {
 	[SerializeField]
+	protected bool _isLockedParameter;
+
+	[Space]
+	[SerializeField]
 	protected string _state;
 
 	[Range(0, 1)]
@@ -38,8 +42,8 @@ public class Live2DPlayer : MonoBehaviour
 
 	protected void LateUpdate()
 	{
-		// CubismModel.Parameters.FindById("ParamAngleX").Value = 27;
-		// CubismModel.LateTick();
+		CubismModel.Parameters.FindById("ParamAngleX").Value = 27;
+		// CubismModel.Refresh();
 	}
 
 	#endregion
@@ -60,6 +64,10 @@ public class Live2DPlayer : MonoBehaviour
 	{
 		Animator.Play(state, 0, normalized);
 		Animator.Update(0);
+
+		if (_isLockedParameter)
+			CubismModel.Parameters.FindById("ParamAngleX").Value = 27;
 		CubismModel.Refresh();
+		//CubismModel.Refresh();
 	}
 }
