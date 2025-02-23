@@ -45,12 +45,6 @@ public class Live2DPlayer : MonoBehaviour
 		SetTime(_state, _normalized);
 	}
 
-	protected void LateUpdate()
-	{
-		CubismModel.Parameters.FindById("ParamAngleX").Value = 27;
-		// CubismModel.Refresh();
-	}
-
 	#endregion
 
 
@@ -72,6 +66,11 @@ public class Live2DPlayer : MonoBehaviour
 
 		if (_isLockedParameter)
 			CubismModel.SetParameter(_parameterId, _angle);
+		
+		// foreach (var parameter in CubismModel.Parameters)
+		// {
+		// 	parameter.Value = 0;
+		// }
 		CubismModel.Refresh();
 	}
 }

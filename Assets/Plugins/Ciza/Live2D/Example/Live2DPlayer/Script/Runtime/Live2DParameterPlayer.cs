@@ -7,6 +7,10 @@ public class Live2DParameterPlayer : MonoBehaviour
 
 	protected void LateUpdate()
 	{
-		CubismModel.SetParameter("ParamAngleX", 27);
+		// CubismModel.SetParameter("flash", 1);
+		// foreach (var parameter in CubismModel.Parameters)
+		// {
+		// 	parameter.Value = 0;
+		// }
 	}
 }
