@@ -1,4 +1,3 @@
-
 using Live2D.Cubism.Core;
 using UnityEngine;
 
@@ -8,6 +7,6 @@ public class Live2DParameterPlayer : MonoBehaviour
 
 	protected void LateUpdate()
 	{
-		CubismModel.Parameters.FindById("ParamAngleX").Value = 27;
+		CubismModel.SetParameter("ParamAngleX", 27);
 	}
 }

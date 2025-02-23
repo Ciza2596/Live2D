@@ -47,6 +47,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _isLockedParameter: 0
+  _parameterId: ParamAngleX
+  _angle: 27
   _state: mtn_01
   _normalized: 0.418
   _sortingMode: 0

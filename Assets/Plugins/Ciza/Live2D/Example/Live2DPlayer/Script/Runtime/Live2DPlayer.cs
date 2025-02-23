@@ -7,7 +7,12 @@ public class Live2DPlayer : MonoBehaviour
 	[SerializeField]
 	protected bool _isLockedParameter;
 
-	[Space]
+	[SerializeField]
+	protected string _parameterId = "ParamAngleX";
+
+	[SerializeField]
+	protected float _angle = 27;
+
 	[SerializeField]
 	protected string _state;
 
@@ -66,8 +71,7 @@ public class Live2DPlayer : MonoBehaviour
 		Animator.Update(0);
 
 		if (_isLockedParameter)
-			CubismModel.Parameters.FindById("ParamAngleX").Value = 27;
+			CubismModel.SetParameter(_parameterId, _angle);
 		CubismModel.Refresh();
-		//CubismModel.Refresh();
 	}
 }

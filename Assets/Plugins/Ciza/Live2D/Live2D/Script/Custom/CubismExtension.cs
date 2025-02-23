@@ -12,7 +12,7 @@ namespace Live2D.Cubism.Core
 		{
 			foreach (var live2DBehaviour in model.GetComponentsInChildren<Behaviour>())
 				live2DBehaviour.enabled = false;
-			
+
 			model.Initialize(sortingMode);
 		}
 
@@ -49,13 +49,20 @@ namespace Live2D.Cubism.Core
 				disable.Disable();
 		}
 
+		public static void SetParameter(this CubismModel model, string id, float value)
+		{
+			var parameter = model.Parameters.FindById(id);
+			if (parameter != null)
+				parameter.Value = value;
+		}
+
 		public static void Tick(this CubismModel model)
 		{
 			Profiler.BeginSample("Cubism.Tick");
 			model.Update();
 			Profiler.EndSample();
 		}
-		
+
 		public static void ForceTick(this CubismModel model)
 		{
 			Profiler.BeginSample("Cubism.ForceTick");
