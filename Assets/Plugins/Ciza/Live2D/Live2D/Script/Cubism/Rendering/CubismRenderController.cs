@@ -841,8 +841,8 @@ namespace Live2D.Cubism.Rendering
 				// Update visibility.
 				if (data[i].IsVisibilityDirty)
 				{
-					Profiler.BeginSample("OnDrawableVisiblityDidChange");
-					renderers[i].OnDrawableVisiblityDidChange(data[i].IsVisible);
+					Profiler.BeginSample("OnDrawableVisibilityDidChange");
+					renderers[i].OnDrawableVisibilityDidChange(data[i].IsVisible);
 					Profiler.EndSample();
 
 					swapMeshes = true;

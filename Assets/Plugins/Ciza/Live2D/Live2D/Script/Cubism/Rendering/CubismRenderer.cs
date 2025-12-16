@@ -230,7 +230,7 @@ namespace Live2D.Cubism.Rendering
 #endif
 
 				MeshRenderer.sharedMaterial = value;
-				//MeshRenderer.material = value;
+				// MeshRenderer.material = value;
 			}
 		}
 
@@ -611,7 +611,7 @@ namespace Live2D.Cubism.Rendering
 		/// Sets visibility.
 		/// </summary>
 		/// <param name="newVisibility">New visibility.</param>
-		internal void OnDrawableVisiblityDidChange(bool newVisibility)
+		internal void OnDrawableVisibilityDidChange(bool newVisibility)
 		{
 			// Set swap flag if visible.
 			if (newVisibility)
