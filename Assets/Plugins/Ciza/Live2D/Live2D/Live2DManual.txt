@@ -1,3 +1,7 @@
 Live2D Manual:
 
 When adjusting the size (Scale) of a Live2D prefab, be sure to scale x, y, and z together.
+
+優化參考：
+1. https://read01.com/2K2dBGE.amp
+2. https://zhuanlan.zhihu.com/p/511532723
