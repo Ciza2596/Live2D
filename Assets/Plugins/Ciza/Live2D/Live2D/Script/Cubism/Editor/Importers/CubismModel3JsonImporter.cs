@@ -13,10 +13,14 @@ using Live2D.Cubism.Framework.Json;
 using Live2D.Cubism.Framework.Motion;
 using Live2D.Cubism.Framework.MotionFade;
 using Live2D.Cubism.Framework.Pose;
+using Live2D.Cubism.Rendering;
 using Live2D.Cubism.Rendering.Masking;
 using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -215,6 +219,8 @@ namespace Live2D.Cubism.Editor.Importers
                     AssetDatabase.CreateAsset(modelMaskTexture, filePath);
                 }
 
+                ApplyArtMeshAlphaOverrides(model, assetPath);
+
                 // Create prefab and trigger saving of changes.
 #if UNITY_2018_3_OR_NEWER
                 ModelPrefab = PrefabUtility.SaveAsPrefabAsset(model.gameObject, $"{assetPath}.prefab");
@@ -262,6 +268,8 @@ namespace Live2D.Cubism.Editor.Importers
                 // Keep layer value.
                 model.gameObject.layer = ModelPrefab.layer;
 
+                ApplyArtMeshAlphaOverrides(model, assetPath);
+
                 // Replace prefab.
 #if UNITY_2018_3_OR_NEWER
                 ModelPrefab = PrefabUtility.SaveAsPrefabAsset(model.gameObject, $"{assetPath}.prefab");
@@ -303,6 +311,148 @@ namespace Live2D.Cubism.Editor.Importers
         }
 
         #endregion
+
+        private static void ApplyArtMeshAlphaOverrides(CubismModel model, string assetPath)
+        {
+            var overridePath = GetArtMeshAlphaOverridePath(assetPath);
+
+            EnsureArtMeshAlphaOverrideTemplate(overridePath);
+
+            var overrides = LoadArtMeshAlphaOverrides(overridePath);
+
+            if (model.Drawables == null)
+            {
+                return;
+            }
+
+            var renderers = model.Drawables.GetComponentsMany<CubismRenderer>();
+
+            if (renderers == null)
+            {
+                return;
+            }
+
+            for (var i = 0; i < renderers.Length; ++i)
+            {
+                renderers[i].AlphaOverride = 1f;
+            }
+
+            if (overrides.Count < 1)
+            {
+                return;
+            }
+
+            var matchedNames = new HashSet<string>();
+
+            for (var i = 0; i < renderers.Length; ++i)
+            {
+                var renderer = renderers[i];
+                float alphaOverride;
+
+                if (!overrides.TryGetValue(renderer.gameObject.name, out alphaOverride))
+                {
+                    continue;
+                }
+
+                renderer.AlphaOverride = alphaOverride;
+                EditorUtility.SetDirty(renderer);
+                matchedNames.Add(renderer.gameObject.name);
+            }
+
+            foreach (var artMeshName in overrides.Keys)
+            {
+                if (!matchedNames.Contains(artMeshName))
+                {
+                    Debug.LogWarningFormat("[Cubism] ArtMesh alpha override \"{0}\" in \"{1}\" did not match any generated ArtMesh.", artMeshName, overridePath);
+                }
+            }
+        }
+
+        private static string GetArtMeshAlphaOverridePath(string assetPath)
+        {
+            var modelFolder = Path.GetDirectoryName(assetPath);
+            var parentFolder = string.IsNullOrEmpty(modelFolder)
+                ? string.Empty
+                : Path.GetDirectoryName(modelFolder);
+            var outputFolder = string.IsNullOrEmpty(parentFolder)
+                ? modelFolder
+                : parentFolder;
+            var modelName = Path.GetFileName(assetPath);
+
+            if (string.IsNullOrEmpty(outputFolder))
+            {
+                return $"{modelName}.ArtMeshOverrides.txt";
+            }
+
+            return $"{outputFolder}/{modelName}.ArtMeshOverrides.txt".Replace('\\', '/');
+        }
+
+        private static void EnsureArtMeshAlphaOverrideTemplate(string overridePath)
+        {
+            if (File.Exists(overridePath))
+            {
+                return;
+            }
+
+            var builder = new StringBuilder();
+            builder.AppendLine("# ArtMeshName,AlphaOverride");
+            builder.AppendLine("# Only list ArtMeshes that need an override.");
+            builder.AppendLine("# 0 = fully transparent, 1 = original/default opacity.");
+            builder.AppendLine("# Example:");
+            builder.AppendLine("# ArtMeshGlowBody,0.8");
+
+            File.WriteAllText(overridePath, builder.ToString(), Encoding.UTF8);
+            AssetDatabase.ImportAsset(overridePath);
+        }
+
+        private static Dictionary<string, float> LoadArtMeshAlphaOverrides(string overridePath)
+        {
+            var overrides = new Dictionary<string, float>();
+            var lines = File.ReadAllLines(overridePath);
+
+            for (var i = 0; i < lines.Length; ++i)
+            {
+                var line = lines[i].Trim();
+
+                if (string.IsNullOrEmpty(line) || line.StartsWith("#"))
+                {
+                    continue;
+                }
+
+                var values = line.Split(',');
+
+                if (values.Length != 2)
+                {
+                    Debug.LogWarningFormat("[Cubism] Malformed ArtMesh alpha override at \"{0}\" line {1}: \"{2}\".", overridePath, i + 1, lines[i]);
+                    continue;
+                }
+
+                var artMeshName = values[0].Trim();
+
+                if (string.IsNullOrEmpty(artMeshName))
+                {
+                    Debug.LogWarningFormat("[Cubism] Missing ArtMesh name in alpha override at \"{0}\" line {1}.", overridePath, i + 1);
+                    continue;
+                }
+
+                float alphaOverride;
+
+                if (!float.TryParse(values[1].Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out alphaOverride))
+                {
+                    Debug.LogWarningFormat("[Cubism] Malformed AlphaOverride value at \"{0}\" line {1}: \"{2}\".", overridePath, i + 1, values[1].Trim());
+                    continue;
+                }
+
+                if (alphaOverride < 0f || alphaOverride > 1f)
+                {
+                    Debug.LogWarningFormat("[Cubism] AlphaOverride value at \"{0}\" line {1} is outside 0..1 and will be clamped: {2}.", overridePath, i + 1, alphaOverride);
+                }
+
+                overrides[artMeshName] = Mathf.Clamp01(alphaOverride);
+            }
+
+            return overrides;
+        }
 
         private static void CopyUserData(CubismModel source, CubismModel destination, bool copyComponentsOnly = false)
         {

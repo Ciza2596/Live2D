@@ -26,6 +26,12 @@ namespace Live2D.Cubism.Rendering
 
 
         /// <summary>
+        /// ArtMesh alpha override shader variable name.
+        /// </summary>
+        public const string AlphaOverride = "cubism_AlphaOverride";
+
+
+        /// <summary>
         /// Diffuse color shader variable name.
         /// </summary>
         public const string MultiplyColor = "cubism_MultiplyColor";

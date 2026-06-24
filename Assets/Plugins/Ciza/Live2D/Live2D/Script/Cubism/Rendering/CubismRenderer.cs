@@ -199,6 +199,33 @@ namespace Live2D.Cubism.Rendering
 		/// </summary>
 		public Color LastScreenColor { get; set; }
 
+		/// <summary>
+		/// <see cref="AlphaOverride"/> backing field.
+		/// </summary>
+		[SerializeField]
+		private float _alphaOverride = 1f;
+
+		/// <summary>
+		/// ArtMesh opacity multiplier.
+		/// </summary>
+		public float AlphaOverride
+		{
+			get { return _alphaOverride; }
+			set
+			{
+				var clampedValue = Mathf.Clamp01(value);
+
+				if (Mathf.Abs(clampedValue - _alphaOverride) < Mathf.Epsilon)
+				{
+					return;
+				}
+
+				_alphaOverride = clampedValue;
+
+				ApplyAlphaOverride();
+			}
+		}
+
 
 		/// <summary>
 		/// <see cref="UnityEngine.Material"/>.
@@ -809,6 +836,29 @@ namespace Live2D.Cubism.Rendering
 		}
 
 		/// <summary>
+		/// Uploads ArtMesh alpha override.
+		/// </summary>
+		public void ApplyAlphaOverride()
+		{
+			MeshRenderer.GetPropertyBlock(SharedPropertyBlock);
+
+
+			// Write property.
+			SharedPropertyBlock.SetFloat(CubismShaderVariables.AlphaOverride, AlphaOverride);
+
+			MeshRenderer.SetPropertyBlock(SharedPropertyBlock);
+		}
+
+		/// <summary>
+		/// Initializes ArtMesh alpha override if possible.
+		/// </summary>
+		private void TryInitializeAlphaOverride()
+		{
+			AlphaOverride = _alphaOverride;
+			ApplyAlphaOverride();
+		}
+
+		/// <summary>
 		/// Initializes the mesh renderer.
 		/// </summary>
 		private void TryInitializeMeshRenderer()
@@ -939,6 +989,7 @@ namespace Live2D.Cubism.Rendering
 			TryInitializeMainTexture();
 			TryInitializeMultiplyColor();
 			TryInitializeScreenColor();
+			TryInitializeAlphaOverride();
 
 			ApplySorting();
 		}

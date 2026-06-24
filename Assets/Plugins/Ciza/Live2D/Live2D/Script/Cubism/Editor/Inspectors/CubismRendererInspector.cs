@@ -94,6 +94,20 @@ namespace Live2D.Cubism.Editor.Inspectors
                 }
             }
 
+            // Display alpha override.
+            using (var scope = new EditorGUI.ChangeCheckScope())
+            {
+                var alphaOverride = EditorGUILayout.Slider("AlphaOverride", renderer.AlphaOverride, 0f, 1f);
+
+                if (scope.changed)
+                {
+                    foreach (CubismRenderer cubismRenderer in targets)
+                    {
+                        cubismRenderer.AlphaOverride = alphaOverride;
+                    }
+                }
+            }
+
             // Display multiply color.
             using (var scope = new EditorGUI.ChangeCheckScope())
             {

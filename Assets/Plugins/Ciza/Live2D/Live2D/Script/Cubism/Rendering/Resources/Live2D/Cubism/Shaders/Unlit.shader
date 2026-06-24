@@ -13,6 +13,7 @@ Shader "Live2D Cubism/Unlit"
         // Texture and model opacity settings.
         [PerRendererData] _MainTex("Main Texture", 2D) = "white" {}
         [PerRendererData] cubism_ModelOpacity("Model Opacity", Float) = 1
+        [PerRendererData] cubism_AlphaOverride("Alpha Override", Range(0, 1)) = 1
 
         // Extension Color settings.
         [PerRendererData] cubism_MultiplyColor("Multiply Color", Color) = (1.0, 1.0, 1.0, 1.0)
