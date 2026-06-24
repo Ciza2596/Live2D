@@ -11,6 +11,7 @@ using Live2D.Cubism.Editor.Importers;
 using Live2D.Cubism.Rendering;
 using Live2D.Cubism.Rendering.Masking;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
@@ -57,6 +58,7 @@ namespace Live2D.Cubism.Editor
             GenerateBuiltinResources();
 
             var assetList = CubismCreatedAssetList.GetInstance();
+            var changedAssetPaths = importedAssetPaths.Concat(movedAssetPaths).ToArray();
 
             // Handle any imported Cubism assets.
             foreach (var assetPath in importedAssetPaths)
@@ -80,6 +82,8 @@ namespace Live2D.Cubism.Editor
                 }
             }
 
+            ReimportModel3JsonsForArtMeshOverrides(changedAssetPaths, importedAssetPaths);
+
             assetList.OnPostImport();
 
             // Handle any deleted Cubism assets.
@@ -98,6 +102,51 @@ namespace Live2D.Cubism.Editor
         }
 
         #endregion
+
+        private static void ReimportModel3JsonsForArtMeshOverrides(string[] changedAssetPaths, string[] importedAssetPaths)
+        {
+            var importedAssetPathSet = new HashSet<string>(importedAssetPaths);
+            var model3JsonPaths = changedAssetPaths
+                .Where(IsArtMeshOverrideAssetPath)
+                .Select(GetModel3JsonPathFromArtMeshOverridePath)
+                .Where(assetPath => !string.IsNullOrEmpty(assetPath))
+                .Distinct()
+                .ToArray();
+
+            foreach (var model3JsonPath in model3JsonPaths)
+            {
+                if (!File.Exists(Path.Combine(Directory.GetCurrentDirectory(), model3JsonPath)))
+                {
+                    Debug.LogWarning("CubismAssetProcessor : Model3 json not found for ArtMesh overrides. Searched: " + model3JsonPath);
+                    continue;
+                }
+
+                if (importedAssetPathSet.Contains(model3JsonPath))
+                {
+                    continue;
+                }
+
+                AssetDatabase.ImportAsset(model3JsonPath, ImportAssetOptions.ForceUpdate);
+            }
+        }
+
+        private static bool IsArtMeshOverrideAssetPath(string assetPath)
+        {
+            return assetPath.EndsWith(".ArtMeshOverrides.txt", StringComparison.Ordinal);
+        }
+
+        private static string GetModel3JsonPathFromArtMeshOverridePath(string artMeshOverridePath)
+        {
+            var folder = Path.GetDirectoryName(artMeshOverridePath);
+            var modelName = Path.GetFileName(artMeshOverridePath).Replace(".ArtMeshOverrides.txt", string.Empty);
+
+            if (string.IsNullOrEmpty(folder) || string.IsNullOrEmpty(modelName))
+            {
+                return string.Empty;
+            }
+
+            return string.Format("{0}/{1}/{1}.model3.json", folder, modelName).Replace('\\', '/');
+        }
 
         #region C# Project Patching
 

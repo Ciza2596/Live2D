@@ -395,11 +395,11 @@ namespace Live2D.Cubism.Editor.Importers
             }
 
             var builder = new StringBuilder();
-            builder.AppendLine("# ArtMeshName,AlphaOverride");
-            builder.AppendLine("# Only list ArtMeshes that need an override.");
-            builder.AppendLine("# 0 = fully transparent, 1 = original/default opacity.");
-            builder.AppendLine("# Example:");
-            builder.AppendLine("# ArtMeshGlowBody,0.8");
+            builder.AppendLine("; ArtMeshName,AlphaOverride");
+            builder.AppendLine("; Only list ArtMeshes that need an override.");
+            builder.AppendLine("; 0 = fully transparent, 1 = original/default opacity.");
+            builder.AppendLine("; Example:");
+            builder.AppendLine("; ArtMeshGlowBody,0.8");
 
             File.WriteAllText(overridePath, builder.ToString(), Encoding.UTF8);
             AssetDatabase.ImportAsset(overridePath);
@@ -412,9 +412,9 @@ namespace Live2D.Cubism.Editor.Importers
 
             for (var i = 0; i < lines.Length; ++i)
             {
-                var line = lines[i].Trim();
+                var line = lines[i].Trim().TrimStart('\uFEFF').Trim();
 
-                if (string.IsNullOrEmpty(line) || line.StartsWith("#"))
+                if (string.IsNullOrEmpty(line) || IsArtMeshAlphaOverrideComment(line))
                 {
                     continue;
                 }
@@ -452,6 +452,11 @@ namespace Live2D.Cubism.Editor.Importers
             }
 
             return overrides;
+        }
+
+        private static bool IsArtMeshAlphaOverrideComment(string line)
+        {
+            return line.StartsWith(";") || line.StartsWith("#");
         }
 
         private static void CopyUserData(CubismModel source, CubismModel destination, bool copyComponentsOnly = false)

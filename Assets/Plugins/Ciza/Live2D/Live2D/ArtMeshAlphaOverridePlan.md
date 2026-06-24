@@ -29,14 +29,16 @@ Models/
 Example file content:
 
 ```csv
-# ArtMeshName,AlphaOverride
-# Only list ArtMeshes that need an override.
+; ArtMeshName,AlphaOverride
+; Only list ArtMeshes that need an override.
 ArtMesh,0.5
 ArtMeshLight01,0.8
 ArtMeshGlowBody,1.0
 ```
 
 The importer reads this file from the model folder's parent folder during model import / prefab generation and applies the listed value only to the matching ArtMesh renderer on that prefab. On the first import, if the file does not exist yet, the importer should create a minimal template file automatically. If the file already exists, the importer must preserve it and never overwrite or append art-authored values.
+
+When an existing `.ArtMeshOverrides.txt` file changes, the asset pipeline should reimport the matching `.model3.json` automatically so the generated prefab receives the latest values.
 
 ## Value Meaning
 
@@ -113,7 +115,7 @@ Do not put this in `TryInitializeMesh()`. Mesh initialization can return early w
 2. Find that file in the parent folder of the model prefab / `.model3.json` folder.
 3. If the file does not exist on first import, create a minimal template file automatically. The template should contain comments and format examples only; do not list every ArtMesh.
 4. If the file already exists, read it without overwriting it and without appending newly discovered ArtMeshes.
-5. Parse each non-empty, non-comment line as `ArtMeshName,AlphaOverride`.
+5. Parse each non-empty, non-comment line as `ArtMeshName,AlphaOverride`. Comment lines start with `; `.
 6. Match `ArtMeshName` against the generated ArtMesh `GameObject.name`. In practice this should align with the ArtMesh name.
 7. Write `AlphaOverride` only to the matched `CubismRenderer`.
 8. Leave all unmatched ArtMeshes at the default value.
