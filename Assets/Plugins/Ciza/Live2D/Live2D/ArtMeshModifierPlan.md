@@ -129,6 +129,12 @@ Do not put this in `TryInitializeMesh()`. Mesh initialization can return early w
 8. Leave all unmatched ArtMeshes at the default value.
 9. Log warnings for malformed lines, malformed RGB hex values, malformed alpha byte values, or missing ArtMesh names, but do not fail the import.
 
+## Inspector Placement
+
+`TintMultiplier` is a custom Ciza-added field, not part of the original Live2D Cubism renderer field group. Show it at the bottom of `CubismRendererInspector`, separated from the original fields by five `EditorGUILayout.Space()` calls and a bold `Modifier` header.
+
+Future Ciza-added fields should follow the same rule: keep the original Live2D fields in their existing order, then place new custom fields at the bottom after the same five-space separation and `Modifier` header.
+
 ## Why This Direction
 
 - Keeps clouds, smoke, and already-correct transparent parts untouched.

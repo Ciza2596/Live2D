@@ -94,20 +94,6 @@ namespace Live2D.Cubism.Editor.Inspectors
                 }
             }
 
-            // Display tint multiplier.
-            using (var scope = new EditorGUI.ChangeCheckScope())
-            {
-                var tintMultiplier = EditorGUILayout.ColorField("TintMultiplier", renderer.TintMultiplier);
-
-                if (scope.changed)
-                {
-                    foreach (CubismRenderer cubismRenderer in targets)
-                    {
-                        cubismRenderer.TintMultiplier = tintMultiplier;
-                    }
-                }
-            }
-
             // Display multiply color.
             using (var scope = new EditorGUI.ChangeCheckScope())
             {
@@ -202,6 +188,30 @@ namespace Live2D.Cubism.Editor.Inspectors
                 {
                     cubismRenderer.MeshFilter.hideFlags ^= HideFlags.HideInInspector;
                     cubismRenderer.MeshRenderer.hideFlags ^= HideFlags.HideInInspector;
+                }
+            }
+
+            EditorGUILayout.Space();
+            EditorGUILayout.Space();
+            EditorGUILayout.Space();
+            EditorGUILayout.Space();
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("Modifier", EditorStyles.boldLabel);
+
+            // Display tint multiplier.
+            using (var scope = new EditorGUI.ChangeCheckScope())
+            {
+                var tintMultiplier = EditorGUILayout.ColorField("TintMultiplier", renderer.TintMultiplier);
+
+                if (scope.changed)
+                {
+                    foreach (CubismRenderer cubismRenderer in targets)
+                    {
+                        cubismRenderer.TintMultiplier = tintMultiplier;
+                        EditorUtility.SetDirty(cubismRenderer);
+                        EditorUtility.SetDirty(cubismRenderer.MeshFilter);
+                        EditorUtility.SetDirty(cubismRenderer.MeshRenderer);
+                    }
                 }
             }
         }
