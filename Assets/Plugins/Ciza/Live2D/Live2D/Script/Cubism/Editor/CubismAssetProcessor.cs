@@ -27,6 +27,13 @@ namespace Live2D.Cubism.Editor
     /// </summary>
     public class CubismAssetProcessor : AssetPostprocessor
     {
+        private static readonly HashSet<string> QueuedArtMeshModifierModel3JsonPaths = new HashSet<string>();
+
+        private static bool IsArtMeshModifierReimportQueued { get; set; }
+
+        private static bool IsArtMeshModifierReimportRunning { get; set; }
+
+
         #region Unity Event Handling
 
 #if !UNITY_2017_3_OR_NEWER
@@ -126,7 +133,75 @@ namespace Live2D.Cubism.Editor
                     continue;
                 }
 
-                AssetDatabase.ImportAsset(model3JsonPath, ImportAssetOptions.ForceUpdate);
+                QueueModel3JsonReimportForArtMeshModifiers(model3JsonPath);
+            }
+        }
+
+        private static void QueueModel3JsonReimportForArtMeshModifiers(string model3JsonPath)
+        {
+            if (string.IsNullOrEmpty(model3JsonPath))
+            {
+                return;
+            }
+
+            QueuedArtMeshModifierModel3JsonPaths.Add(model3JsonPath);
+
+            if (IsArtMeshModifierReimportQueued)
+            {
+                return;
+            }
+
+            IsArtMeshModifierReimportQueued = true;
+            EditorApplication.delayCall += ReimportQueuedModel3JsonsForArtMeshModifiers;
+        }
+
+        private static void QueueModel3JsonReimportForArtMeshModifiers(IEnumerable<string> model3JsonPaths)
+        {
+            foreach (var model3JsonPath in model3JsonPaths)
+            {
+                QueueModel3JsonReimportForArtMeshModifiers(model3JsonPath);
+            }
+        }
+
+        private static void ReimportQueuedModel3JsonsForArtMeshModifiers()
+        {
+            IsArtMeshModifierReimportQueued = false;
+
+            if (IsArtMeshModifierReimportRunning)
+            {
+                QueueModel3JsonReimportForArtMeshModifiers(QueuedArtMeshModifierModel3JsonPaths.ToArray());
+                return;
+            }
+
+            if (EditorApplication.isCompiling || EditorApplication.isUpdating)
+            {
+                QueueModel3JsonReimportForArtMeshModifiers(QueuedArtMeshModifierModel3JsonPaths.ToArray());
+                return;
+            }
+
+            var model3JsonPaths = QueuedArtMeshModifierModel3JsonPaths
+                .OrderBy(assetPath => assetPath)
+                .ToArray();
+
+            QueuedArtMeshModifierModel3JsonPaths.Clear();
+            IsArtMeshModifierReimportRunning = true;
+
+            try
+            {
+                foreach (var model3JsonPath in model3JsonPaths)
+                {
+                    if (!File.Exists(Path.Combine(Directory.GetCurrentDirectory(), model3JsonPath)))
+                    {
+                        Debug.LogWarning("CubismAssetProcessor : Model3 json not found for ArtMesh modifiers. Searched: " + model3JsonPath);
+                        continue;
+                    }
+
+                    AssetDatabase.ImportAsset(model3JsonPath, ImportAssetOptions.ForceUpdate);
+                }
+            }
+            finally
+            {
+                IsArtMeshModifierReimportRunning = false;
             }
         }
 
