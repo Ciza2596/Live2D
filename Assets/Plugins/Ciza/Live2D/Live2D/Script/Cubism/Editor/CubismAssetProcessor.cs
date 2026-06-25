@@ -25,8 +25,11 @@ namespace Live2D.Cubism.Editor
     /// <summary>
     /// Hooks into Unity's asset pipeline allowing custom processing of assets.
     /// </summary>
+    [InitializeOnLoad]
     public class CubismAssetProcessor : AssetPostprocessor
     {
+        private const string PendingArtMeshModifierModel3JsonPathsSessionKey = "Ciza.Live2D.PendingArtMeshModifierModel3JsonPaths";
+
         private static readonly HashSet<string> QueuedArtMeshModifierModel3JsonPaths = new HashSet<string>();
 
         private static bool IsArtMeshModifierReimportQueued { get; set; }
@@ -35,6 +38,12 @@ namespace Live2D.Cubism.Editor
 
 
         #region Unity Event Handling
+
+        static CubismAssetProcessor()
+        {
+            EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
+            EditorApplication.delayCall += QueuePendingModel3JsonReimportsForArtMeshModifiers;
+        }
 
 #if !UNITY_2017_3_OR_NEWER
         /// <summary>
@@ -108,6 +117,11 @@ namespace Live2D.Cubism.Editor
 
         }
 
+        private static void OnPlayModeStateChanged(PlayModeStateChange state)
+        {
+            EditorApplication.delayCall += QueuePendingModel3JsonReimportsForArtMeshModifiers;
+        }
+
         #endregion
 
         private static void ReimportModel3JsonsForArtMeshModifiers(string[] changedAssetPaths, string[] importedAssetPaths)
@@ -167,6 +181,13 @@ namespace Live2D.Cubism.Editor
         {
             IsArtMeshModifierReimportQueued = false;
 
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
+            {
+                StorePendingModel3JsonReimportsForArtMeshModifiers(QueuedArtMeshModifierModel3JsonPaths);
+                QueuedArtMeshModifierModel3JsonPaths.Clear();
+                return;
+            }
+
             if (IsArtMeshModifierReimportRunning)
             {
                 QueueModel3JsonReimportForArtMeshModifiers(QueuedArtMeshModifierModel3JsonPaths.ToArray());
@@ -203,6 +224,54 @@ namespace Live2D.Cubism.Editor
             {
                 IsArtMeshModifierReimportRunning = false;
             }
+        }
+
+        private static void QueuePendingModel3JsonReimportsForArtMeshModifiers()
+        {
+            if (EditorApplication.isPlayingOrWillChangePlaymode)
+            {
+                return;
+            }
+
+            var pendingModel3JsonPaths = LoadPendingModel3JsonReimportsForArtMeshModifiers();
+
+            if (pendingModel3JsonPaths.Length < 1)
+            {
+                return;
+            }
+
+            SessionState.EraseString(PendingArtMeshModifierModel3JsonPathsSessionKey);
+            QueueModel3JsonReimportForArtMeshModifiers(pendingModel3JsonPaths);
+        }
+
+        private static void StorePendingModel3JsonReimportsForArtMeshModifiers(IEnumerable<string> model3JsonPaths)
+        {
+            var pendingModel3JsonPaths = new HashSet<string>(LoadPendingModel3JsonReimportsForArtMeshModifiers());
+
+            foreach (var model3JsonPath in model3JsonPaths)
+            {
+                if (!string.IsNullOrEmpty(model3JsonPath))
+                {
+                    pendingModel3JsonPaths.Add(model3JsonPath);
+                }
+            }
+
+            SessionState.SetString(PendingArtMeshModifierModel3JsonPathsSessionKey, string.Join("\n", pendingModel3JsonPaths.OrderBy(assetPath => assetPath).ToArray()));
+        }
+
+        private static string[] LoadPendingModel3JsonReimportsForArtMeshModifiers()
+        {
+            var pendingModel3JsonPaths = SessionState.GetString(PendingArtMeshModifierModel3JsonPathsSessionKey, string.Empty);
+
+            if (string.IsNullOrEmpty(pendingModel3JsonPaths))
+            {
+                return new string[0];
+            }
+
+            return pendingModel3JsonPaths
+                .Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries)
+                .Distinct()
+                .ToArray();
         }
 
         private static bool IsArtMeshModifierAssetPath(string assetPath)

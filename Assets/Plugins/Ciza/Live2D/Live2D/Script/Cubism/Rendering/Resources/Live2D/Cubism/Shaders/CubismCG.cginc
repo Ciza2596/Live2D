@@ -120,11 +120,49 @@ inline float CubismSampleMaskTexture(sampler2D tex, float4 channel, float2 coord
 #define CUBISM_SHADER_VARIABLES     \
     float cubism_ModelOpacity;      \
     float4 cubism_TintMultiplier;   \
+    float cubism_IsUseGammaInLinear; \
     CUBISM_MASK_SHADER_VARIABLES
+
+
+inline fixed3 CubismLinearToGammaForModifier(fixed3 color)
+{
+#if defined(UNITY_COLORSPACE_GAMMA)
+    return color;
+#else
+    return LinearToGammaSpace(color);
+#endif
+}
+
+
+inline fixed3 CubismGammaToLinearForModifier(fixed3 color)
+{
+#if defined(UNITY_COLORSPACE_GAMMA)
+    return color;
+#else
+    return GammaToLinearSpace(color);
+#endif
+}
+
+
+#if defined(CUBISM_MASK_ON)
+#define CUBISM_APPLY_LINEAR_FOR_GAMMA_ALPHA(COLOR) \
+    COLOR.rgb *= COLOR.a;
+#else
+#define CUBISM_APPLY_LINEAR_FOR_GAMMA_ALPHA(COLOR)                  \
+    if (cubism_IsUseGammaInLinear > 0.5)                            \
+    {                                                               \
+        COLOR.rgb *= pow(saturate(COLOR.a), 0.7);                   \
+        COLOR.rgb = CubismGammaToLinearForModifier(COLOR.rgb);      \
+    }                                                               \
+    else                                                            \
+    {                                                               \
+        COLOR.rgb *= COLOR.a;                                       \
+    }
+#endif
 
 #define CUBISM_APPLY_ALPHA(IN, COLOR)   \
     COLOR *= cubism_TintMultiplier;      \
-    COLOR.rgb *= COLOR.a;               \
+    CUBISM_APPLY_LINEAR_FOR_GAMMA_ALPHA(COLOR); \
     CUBISM_APPLY_MASK(IN, COLOR);       \
     COLOR *= cubism_ModelOpacity;
 

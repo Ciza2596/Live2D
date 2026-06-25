@@ -224,6 +224,31 @@ namespace Live2D.Cubism.Rendering
 			}
 		}
 
+		/// <summary>
+		/// <see cref="IsUseGammaInLinear"/> backing field.
+		/// </summary>
+		[SerializeField]
+		private bool _isUseGammaInLinear;
+
+		/// <summary>
+		/// Whether to use the Gamma-authored alpha correction path in Linear color space.
+		/// </summary>
+		public bool IsUseGammaInLinear
+		{
+			get { return _isUseGammaInLinear; }
+			set
+			{
+				if (value == _isUseGammaInLinear)
+				{
+					return;
+				}
+
+				_isUseGammaInLinear = value;
+
+				ApplyIsUseGammaInLinear();
+			}
+		}
+
 
 		/// <summary>
 		/// <see cref="UnityEngine.Material"/>.
@@ -248,6 +273,7 @@ namespace Live2D.Cubism.Rendering
 				if (!Application.isPlaying)
 				{
 					MeshRenderer.sharedMaterial = value;
+					ApplyIsUseGammaInLinear();
 
 
 					return;
@@ -255,6 +281,7 @@ namespace Live2D.Cubism.Rendering
 #endif
 
 				MeshRenderer.sharedMaterial = value;
+				ApplyIsUseGammaInLinear();
 				// MeshRenderer.material = value;
 			}
 		}
@@ -857,6 +884,59 @@ namespace Live2D.Cubism.Rendering
 		}
 
 		/// <summary>
+		/// Uploads Gamma-authored alpha correction flag.
+		/// </summary>
+		public void ApplyIsUseGammaInLinear()
+		{
+			MeshRenderer.GetPropertyBlock(SharedPropertyBlock);
+
+
+			// Write property. Only the normal Unlit material path should use this correction.
+			SharedPropertyBlock.SetFloat(CubismShaderVariables.IsUseGammaInLinear, ShouldApplyGammaInLinear() ? 1f : 0f);
+
+			MeshRenderer.SetPropertyBlock(SharedPropertyBlock);
+		}
+
+		/// <summary>
+		/// Initializes Gamma-authored alpha correction flag if possible.
+		/// </summary>
+		private void TryInitializeIsUseGammaInLinear()
+		{
+			IsUseGammaInLinear = _isUseGammaInLinear;
+			ApplyIsUseGammaInLinear();
+		}
+
+		private bool ShouldApplyGammaInLinear()
+		{
+			if (!IsUseGammaInLinear)
+			{
+				return false;
+			}
+
+			var material = Material;
+
+			if (material == null || material.shader == null || material.shader.name != "Live2D Cubism/Unlit")
+			{
+				return false;
+			}
+
+			if (material.IsKeywordEnabled("CUBISM_MASK_ON") || material.IsKeywordEnabled("CUBISM_INVERT_ON"))
+			{
+				return false;
+			}
+
+			var materialName = material.name;
+			const string instanceSuffix = " (Instance)";
+
+			if (materialName.EndsWith(instanceSuffix, StringComparison.Ordinal))
+			{
+				materialName = materialName.Substring(0, materialName.Length - instanceSuffix.Length);
+			}
+
+			return materialName == "Unlit" || materialName == "UnlitCulling";
+		}
+
+		/// <summary>
 		/// Initializes the mesh renderer.
 		/// </summary>
 		private void TryInitializeMeshRenderer()
@@ -988,6 +1068,7 @@ namespace Live2D.Cubism.Rendering
 			TryInitializeMultiplyColor();
 			TryInitializeScreenColor();
 			TryInitializeTintMultiplier();
+			TryInitializeIsUseGammaInLinear();
 
 			ApplySorting();
 		}

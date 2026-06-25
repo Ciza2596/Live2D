@@ -214,6 +214,23 @@ namespace Live2D.Cubism.Editor.Inspectors
                     }
                 }
             }
+
+            // Display Gamma-authored alpha correction flag.
+            using (var scope = new EditorGUI.ChangeCheckScope())
+            {
+                var isUseGammaInLinear = EditorGUILayout.Toggle("IsUseGammaInLinear", renderer.IsUseGammaInLinear);
+
+                if (scope.changed)
+                {
+                    foreach (CubismRenderer cubismRenderer in targets)
+                    {
+                        cubismRenderer.IsUseGammaInLinear = isUseGammaInLinear;
+                        EditorUtility.SetDirty(cubismRenderer);
+                        EditorUtility.SetDirty(cubismRenderer.MeshFilter);
+                        EditorUtility.SetDirty(cubismRenderer.MeshRenderer);
+                    }
+                }
+            }
         }
 
         #endregion

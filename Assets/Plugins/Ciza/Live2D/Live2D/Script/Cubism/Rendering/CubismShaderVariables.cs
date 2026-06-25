@@ -32,6 +32,12 @@ namespace Live2D.Cubism.Rendering
 
 
         /// <summary>
+        /// Gamma-authored alpha correction shader variable name.
+        /// </summary>
+        public const string IsUseGammaInLinear = "cubism_IsUseGammaInLinear";
+
+
+        /// <summary>
         /// Diffuse color shader variable name.
         /// </summary>
         public const string MultiplyColor = "cubism_MultiplyColor";

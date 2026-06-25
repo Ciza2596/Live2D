@@ -14,6 +14,7 @@ Shader "Live2D Cubism/Unlit"
         [PerRendererData] _MainTex("Main Texture", 2D) = "white" {}
         [PerRendererData] cubism_ModelOpacity("Model Opacity", Float) = 1
         [PerRendererData] cubism_TintMultiplier("Tint Multiplier", Color) = (1.0, 1.0, 1.0, 1.0)
+        [PerRendererData] cubism_IsUseGammaInLinear("Is Use Gamma In Linear", Float) = 0
 
         // Extension Color settings.
         [PerRendererData] cubism_MultiplyColor("Multiply Color", Color) = (1.0, 1.0, 1.0, 1.0)
@@ -121,11 +122,20 @@ Shader "Live2D Cubism/Unlit"
             fixed4 frag (v2f IN) : SV_Target
             {
                 fixed4 textureColor = tex2D(_MainTex, IN.texcoord);
+                fixed4 multiplyColor = cubism_MultiplyColor;
+                fixed4 screenColor = cubism_ScreenColor;
+
+                if (cubism_IsUseGammaInLinear > 0.5)
+                {
+                    textureColor.rgb = CubismLinearToGammaForModifier(textureColor.rgb);
+                    multiplyColor.rgb = CubismLinearToGammaForModifier(multiplyColor.rgb);
+                    screenColor.rgb = CubismLinearToGammaForModifier(screenColor.rgb);
+                }
 
                 // Multiply
-                textureColor.rgb *= cubism_MultiplyColor.rgb;
+                textureColor.rgb *= multiplyColor.rgb;
                 // Screen
-                textureColor.rgb = (textureColor.rgb + cubism_ScreenColor.rgb) - (textureColor.rgb * cubism_ScreenColor.rgb);
+                textureColor.rgb = (textureColor.rgb + screenColor.rgb) - (textureColor.rgb * screenColor.rgb);
 
                 fixed4 OUT = textureColor * IN.color;
 

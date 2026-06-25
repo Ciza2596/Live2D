@@ -312,6 +312,19 @@ namespace Live2D.Cubism.Editor.Importers
 
         #endregion
 
+        private struct ArtMeshModifier
+        {
+            public ArtMeshModifier(Color tintMultiplier, bool isUseGammaInLinear)
+            {
+                TintMultiplier = tintMultiplier;
+                IsUseGammaInLinear = isUseGammaInLinear;
+            }
+
+            public Color TintMultiplier { get; private set; }
+
+            public bool IsUseGammaInLinear { get; private set; }
+        }
+
         private static void ApplyArtMeshModifiers(CubismModel model, string assetPath)
         {
             var modifierPath = GetArtMeshModifierPath(assetPath);
@@ -335,6 +348,7 @@ namespace Live2D.Cubism.Editor.Importers
             for (var i = 0; i < renderers.Length; ++i)
             {
                 renderers[i].TintMultiplier = Color.white;
+                renderers[i].IsUseGammaInLinear = false;
             }
 
             if (modifiers.Count < 1)
@@ -347,14 +361,15 @@ namespace Live2D.Cubism.Editor.Importers
             for (var i = 0; i < renderers.Length; ++i)
             {
                 var renderer = renderers[i];
-                Color tintMultiplier;
+                ArtMeshModifier modifier;
 
-                if (!modifiers.TryGetValue(renderer.gameObject.name, out tintMultiplier))
+                if (!modifiers.TryGetValue(renderer.gameObject.name, out modifier))
                 {
                     continue;
                 }
 
-                renderer.TintMultiplier = tintMultiplier;
+                renderer.TintMultiplier = modifier.TintMultiplier;
+                renderer.IsUseGammaInLinear = modifier.IsUseGammaInLinear;
                 EditorUtility.SetDirty(renderer);
                 matchedNames.Add(renderer.gameObject.name);
             }
@@ -395,19 +410,19 @@ namespace Live2D.Cubism.Editor.Importers
             }
 
             var builder = new StringBuilder();
-            builder.AppendLine("; ArtMeshName,TintMultiplier");
+            builder.AppendLine("; ArtMeshName,TintMultiplier,IsUseGammaInLinear");
             builder.AppendLine("; Only list ArtMeshes that need a modifier.");
             builder.AppendLine("; Format: RRGGBBAlpha, for example FFFFFF255 or FFFFFF128.");
             builder.AppendLine("; Example:");
-            builder.AppendLine("; ArtMeshGlowBody,FFFFFF204");
+            builder.AppendLine("; ArtMesh, FFFFFF255, true");
 
             File.WriteAllText(modifierPath, builder.ToString(), Encoding.UTF8);
             AssetDatabase.ImportAsset(modifierPath);
         }
 
-        private static Dictionary<string, Color> LoadArtMeshModifiers(string modifierPath)
+        private static Dictionary<string, ArtMeshModifier> LoadArtMeshModifiers(string modifierPath)
         {
-            var modifiers = new Dictionary<string, Color>();
+            var modifiers = new Dictionary<string, ArtMeshModifier>();
             var lines = File.ReadAllLines(modifierPath);
 
             for (var i = 0; i < lines.Length; ++i)
@@ -421,7 +436,7 @@ namespace Live2D.Cubism.Editor.Importers
 
                 var values = line.Split(',');
 
-                if (values.Length != 2)
+                if (values.Length != 2 && values.Length != 3)
                 {
                     Debug.LogWarningFormat("[Cubism] Malformed ArtMesh modifier at \"{0}\" line {1}: \"{2}\".", modifierPath, i + 1, lines[i]);
                     continue;
@@ -443,7 +458,15 @@ namespace Live2D.Cubism.Editor.Importers
                     continue;
                 }
 
-                modifiers[artMeshName] = tintMultiplier;
+                var isUseGammaInLinear = false;
+
+                if (values.Length == 3 && !bool.TryParse(values[2].Trim(), out isUseGammaInLinear))
+                {
+                    Debug.LogWarningFormat("[Cubism] Malformed IsUseGammaInLinear value at \"{0}\" line {1}: \"{2}\".", modifierPath, i + 1, values[2].Trim());
+                    continue;
+                }
+
+                modifiers[artMeshName] = new ArtMeshModifier(tintMultiplier, isUseGammaInLinear);
             }
 
             return modifiers;
