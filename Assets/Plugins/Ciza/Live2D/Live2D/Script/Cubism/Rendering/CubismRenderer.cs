@@ -200,29 +200,27 @@ namespace Live2D.Cubism.Rendering
 		public Color LastScreenColor { get; set; }
 
 		/// <summary>
-		/// <see cref="AlphaOverride"/> backing field.
+		/// <see cref="TintMultiplier"/> backing field.
 		/// </summary>
 		[SerializeField]
-		private float _alphaOverride = 1f;
+		private Color _tintMultiplier = Color.white;
 
 		/// <summary>
-		/// ArtMesh opacity multiplier.
+		/// ArtMesh tint and opacity multiplier.
 		/// </summary>
-		public float AlphaOverride
+		public Color TintMultiplier
 		{
-			get { return _alphaOverride; }
+			get { return _tintMultiplier; }
 			set
 			{
-				var clampedValue = Mathf.Clamp01(value);
-
-				if (Mathf.Abs(clampedValue - _alphaOverride) < Mathf.Epsilon)
+				if (value == _tintMultiplier)
 				{
 					return;
 				}
 
-				_alphaOverride = clampedValue;
+				_tintMultiplier = value;
 
-				ApplyAlphaOverride();
+				ApplyTintMultiplier();
 			}
 		}
 
@@ -836,26 +834,26 @@ namespace Live2D.Cubism.Rendering
 		}
 
 		/// <summary>
-		/// Uploads ArtMesh alpha override.
+		/// Uploads ArtMesh tint multiplier.
 		/// </summary>
-		public void ApplyAlphaOverride()
+		public void ApplyTintMultiplier()
 		{
 			MeshRenderer.GetPropertyBlock(SharedPropertyBlock);
 
 
 			// Write property.
-			SharedPropertyBlock.SetFloat(CubismShaderVariables.AlphaOverride, AlphaOverride);
+			SharedPropertyBlock.SetColor(CubismShaderVariables.TintMultiplier, TintMultiplier);
 
 			MeshRenderer.SetPropertyBlock(SharedPropertyBlock);
 		}
 
 		/// <summary>
-		/// Initializes ArtMesh alpha override if possible.
+		/// Initializes ArtMesh tint multiplier if possible.
 		/// </summary>
-		private void TryInitializeAlphaOverride()
+		private void TryInitializeTintMultiplier()
 		{
-			AlphaOverride = _alphaOverride;
-			ApplyAlphaOverride();
+			TintMultiplier = _tintMultiplier;
+			ApplyTintMultiplier();
 		}
 
 		/// <summary>
@@ -989,7 +987,7 @@ namespace Live2D.Cubism.Rendering
 			TryInitializeMainTexture();
 			TryInitializeMultiplyColor();
 			TryInitializeScreenColor();
-			TryInitializeAlphaOverride();
+			TryInitializeTintMultiplier();
 
 			ApplySorting();
 		}

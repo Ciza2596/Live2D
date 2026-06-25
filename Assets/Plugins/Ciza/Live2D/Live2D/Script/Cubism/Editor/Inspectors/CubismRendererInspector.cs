@@ -94,16 +94,16 @@ namespace Live2D.Cubism.Editor.Inspectors
                 }
             }
 
-            // Display alpha override.
+            // Display tint multiplier.
             using (var scope = new EditorGUI.ChangeCheckScope())
             {
-                var alphaOverride = EditorGUILayout.Slider("AlphaOverride", renderer.AlphaOverride, 0f, 1f);
+                var tintMultiplier = EditorGUILayout.ColorField("TintMultiplier", renderer.TintMultiplier);
 
                 if (scope.changed)
                 {
                     foreach (CubismRenderer cubismRenderer in targets)
                     {
-                        cubismRenderer.AlphaOverride = alphaOverride;
+                        cubismRenderer.TintMultiplier = tintMultiplier;
                     }
                 }
             }

@@ -82,7 +82,7 @@ namespace Live2D.Cubism.Editor
                 }
             }
 
-            ReimportModel3JsonsForArtMeshOverrides(changedAssetPaths, importedAssetPaths);
+            ReimportModel3JsonsForArtMeshModifiers(changedAssetPaths, importedAssetPaths);
 
             assetList.OnPostImport();
 
@@ -103,12 +103,12 @@ namespace Live2D.Cubism.Editor
 
         #endregion
 
-        private static void ReimportModel3JsonsForArtMeshOverrides(string[] changedAssetPaths, string[] importedAssetPaths)
+        private static void ReimportModel3JsonsForArtMeshModifiers(string[] changedAssetPaths, string[] importedAssetPaths)
         {
             var importedAssetPathSet = new HashSet<string>(importedAssetPaths);
             var model3JsonPaths = changedAssetPaths
-                .Where(IsArtMeshOverrideAssetPath)
-                .Select(GetModel3JsonPathFromArtMeshOverridePath)
+                .Where(IsArtMeshModifierAssetPath)
+                .Select(GetModel3JsonPathFromArtMeshModifierPath)
                 .Where(assetPath => !string.IsNullOrEmpty(assetPath))
                 .Distinct()
                 .ToArray();
@@ -117,7 +117,7 @@ namespace Live2D.Cubism.Editor
             {
                 if (!File.Exists(Path.Combine(Directory.GetCurrentDirectory(), model3JsonPath)))
                 {
-                    Debug.LogWarning("CubismAssetProcessor : Model3 json not found for ArtMesh overrides. Searched: " + model3JsonPath);
+                    Debug.LogWarning("CubismAssetProcessor : Model3 json not found for ArtMesh modifiers. Searched: " + model3JsonPath);
                     continue;
                 }
 
@@ -130,15 +130,15 @@ namespace Live2D.Cubism.Editor
             }
         }
 
-        private static bool IsArtMeshOverrideAssetPath(string assetPath)
+        private static bool IsArtMeshModifierAssetPath(string assetPath)
         {
-            return assetPath.EndsWith(".ArtMeshOverrides.txt", StringComparison.Ordinal);
+            return assetPath.EndsWith(".ArtMeshModifier.txt", StringComparison.Ordinal);
         }
 
-        private static string GetModel3JsonPathFromArtMeshOverridePath(string artMeshOverridePath)
+        private static string GetModel3JsonPathFromArtMeshModifierPath(string artMeshModifierPath)
         {
-            var folder = Path.GetDirectoryName(artMeshOverridePath);
-            var modelName = Path.GetFileName(artMeshOverridePath).Replace(".ArtMeshOverrides.txt", string.Empty);
+            var folder = Path.GetDirectoryName(artMeshModifierPath);
+            var modelName = Path.GetFileName(artMeshModifierPath).Replace(".ArtMeshModifier.txt", string.Empty);
 
             if (string.IsNullOrEmpty(folder) || string.IsNullOrEmpty(modelName))
             {

@@ -1,0 +1,7 @@
+﻿; ArtMeshName,TintMultiplier
+; Only list ArtMeshes that need a modifier.
+; Format: RRGGBBAlpha, for example FFFFFF1 or FFFFFF0.5.
+; Example:
+; ArtMeshGlowBody,FFFFFF0.8
+
+ArtMesh15, FFFFFF0.5

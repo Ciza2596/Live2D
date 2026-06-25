@@ -119,14 +119,14 @@ inline float CubismSampleMaskTexture(sampler2D tex, float4 channel, float2 coord
 
 #define CUBISM_SHADER_VARIABLES     \
     float cubism_ModelOpacity;      \
-    float cubism_AlphaOverride;     \
+    float4 cubism_TintMultiplier;   \
     CUBISM_MASK_SHADER_VARIABLES
 
 #define CUBISM_APPLY_ALPHA(IN, COLOR)   \
+    COLOR *= cubism_TintMultiplier;      \
     COLOR.rgb *= COLOR.a;               \
     CUBISM_APPLY_MASK(IN, COLOR);       \
-    COLOR *= cubism_ModelOpacity;       \
-    COLOR *= cubism_AlphaOverride;
+    COLOR *= cubism_ModelOpacity;
 
 
 #endif

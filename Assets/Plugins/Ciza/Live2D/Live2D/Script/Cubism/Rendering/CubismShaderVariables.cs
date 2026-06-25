@@ -26,9 +26,9 @@ namespace Live2D.Cubism.Rendering
 
 
         /// <summary>
-        /// ArtMesh alpha override shader variable name.
+        /// ArtMesh tint multiplier shader variable name.
         /// </summary>
-        public const string AlphaOverride = "cubism_AlphaOverride";
+        public const string TintMultiplier = "cubism_TintMultiplier";
 
 
         /// <summary>

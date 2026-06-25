@@ -219,7 +219,7 @@ namespace Live2D.Cubism.Editor.Importers
                     AssetDatabase.CreateAsset(modelMaskTexture, filePath);
                 }
 
-                ApplyArtMeshAlphaOverrides(model, assetPath);
+                ApplyArtMeshModifiers(model, assetPath);
 
                 // Create prefab and trigger saving of changes.
 #if UNITY_2018_3_OR_NEWER
@@ -268,7 +268,7 @@ namespace Live2D.Cubism.Editor.Importers
                 // Keep layer value.
                 model.gameObject.layer = ModelPrefab.layer;
 
-                ApplyArtMeshAlphaOverrides(model, assetPath);
+                ApplyArtMeshModifiers(model, assetPath);
 
                 // Replace prefab.
 #if UNITY_2018_3_OR_NEWER
@@ -312,13 +312,13 @@ namespace Live2D.Cubism.Editor.Importers
 
         #endregion
 
-        private static void ApplyArtMeshAlphaOverrides(CubismModel model, string assetPath)
+        private static void ApplyArtMeshModifiers(CubismModel model, string assetPath)
         {
-            var overridePath = GetArtMeshAlphaOverridePath(assetPath);
+            var modifierPath = GetArtMeshModifierPath(assetPath);
 
-            EnsureArtMeshAlphaOverrideTemplate(overridePath);
+            EnsureArtMeshModifierTemplate(modifierPath);
 
-            var overrides = LoadArtMeshAlphaOverrides(overridePath);
+            var modifiers = LoadArtMeshModifiers(modifierPath);
 
             if (model.Drawables == null)
             {
@@ -334,10 +334,10 @@ namespace Live2D.Cubism.Editor.Importers
 
             for (var i = 0; i < renderers.Length; ++i)
             {
-                renderers[i].AlphaOverride = 1f;
+                renderers[i].TintMultiplier = Color.white;
             }
 
-            if (overrides.Count < 1)
+            if (modifiers.Count < 1)
             {
                 return;
             }
@@ -347,28 +347,28 @@ namespace Live2D.Cubism.Editor.Importers
             for (var i = 0; i < renderers.Length; ++i)
             {
                 var renderer = renderers[i];
-                float alphaOverride;
+                Color tintMultiplier;
 
-                if (!overrides.TryGetValue(renderer.gameObject.name, out alphaOverride))
+                if (!modifiers.TryGetValue(renderer.gameObject.name, out tintMultiplier))
                 {
                     continue;
                 }
 
-                renderer.AlphaOverride = alphaOverride;
+                renderer.TintMultiplier = tintMultiplier;
                 EditorUtility.SetDirty(renderer);
                 matchedNames.Add(renderer.gameObject.name);
             }
 
-            foreach (var artMeshName in overrides.Keys)
+            foreach (var artMeshName in modifiers.Keys)
             {
                 if (!matchedNames.Contains(artMeshName))
                 {
-                    Debug.LogWarningFormat("[Cubism] ArtMesh alpha override \"{0}\" in \"{1}\" did not match any generated ArtMesh.", artMeshName, overridePath);
+                    Debug.LogWarningFormat("[Cubism] ArtMesh modifier \"{0}\" in \"{1}\" did not match any generated ArtMesh.", artMeshName, modifierPath);
                 }
             }
         }
 
-        private static string GetArtMeshAlphaOverridePath(string assetPath)
+        private static string GetArtMeshModifierPath(string assetPath)
         {
             var modelFolder = Path.GetDirectoryName(assetPath);
             var parentFolder = string.IsNullOrEmpty(modelFolder)
@@ -381,40 +381,40 @@ namespace Live2D.Cubism.Editor.Importers
 
             if (string.IsNullOrEmpty(outputFolder))
             {
-                return $"{modelName}.ArtMeshOverrides.txt";
+                return $"{modelName}.ArtMeshModifier.txt";
             }
 
-            return $"{outputFolder}/{modelName}.ArtMeshOverrides.txt".Replace('\\', '/');
+            return $"{outputFolder}/{modelName}.ArtMeshModifier.txt".Replace('\\', '/');
         }
 
-        private static void EnsureArtMeshAlphaOverrideTemplate(string overridePath)
+        private static void EnsureArtMeshModifierTemplate(string modifierPath)
         {
-            if (File.Exists(overridePath))
+            if (File.Exists(modifierPath))
             {
                 return;
             }
 
             var builder = new StringBuilder();
-            builder.AppendLine("; ArtMeshName,AlphaOverride");
-            builder.AppendLine("; Only list ArtMeshes that need an override.");
-            builder.AppendLine("; 0 = fully transparent, 1 = original/default opacity.");
+            builder.AppendLine("; ArtMeshName,TintMultiplier");
+            builder.AppendLine("; Only list ArtMeshes that need a modifier.");
+            builder.AppendLine("; Format: RRGGBBAlpha, for example FFFFFF1 or FFFFFF0.5.");
             builder.AppendLine("; Example:");
-            builder.AppendLine("; ArtMeshGlowBody,0.8");
+            builder.AppendLine("; ArtMeshGlowBody,FFFFFF0.8");
 
-            File.WriteAllText(overridePath, builder.ToString(), Encoding.UTF8);
-            AssetDatabase.ImportAsset(overridePath);
+            File.WriteAllText(modifierPath, builder.ToString(), Encoding.UTF8);
+            AssetDatabase.ImportAsset(modifierPath);
         }
 
-        private static Dictionary<string, float> LoadArtMeshAlphaOverrides(string overridePath)
+        private static Dictionary<string, Color> LoadArtMeshModifiers(string modifierPath)
         {
-            var overrides = new Dictionary<string, float>();
-            var lines = File.ReadAllLines(overridePath);
+            var modifiers = new Dictionary<string, Color>();
+            var lines = File.ReadAllLines(modifierPath);
 
             for (var i = 0; i < lines.Length; ++i)
             {
                 var line = lines[i].Trim().TrimStart('\uFEFF').Trim();
 
-                if (string.IsNullOrEmpty(line) || IsArtMeshAlphaOverrideComment(line))
+                if (string.IsNullOrEmpty(line) || IsArtMeshModifierComment(line))
                 {
                     continue;
                 }
@@ -423,7 +423,7 @@ namespace Live2D.Cubism.Editor.Importers
 
                 if (values.Length != 2)
                 {
-                    Debug.LogWarningFormat("[Cubism] Malformed ArtMesh alpha override at \"{0}\" line {1}: \"{2}\".", overridePath, i + 1, lines[i]);
+                    Debug.LogWarningFormat("[Cubism] Malformed ArtMesh modifier at \"{0}\" line {1}: \"{2}\".", modifierPath, i + 1, lines[i]);
                     continue;
                 }
 
@@ -431,30 +431,64 @@ namespace Live2D.Cubism.Editor.Importers
 
                 if (string.IsNullOrEmpty(artMeshName))
                 {
-                    Debug.LogWarningFormat("[Cubism] Missing ArtMesh name in alpha override at \"{0}\" line {1}.", overridePath, i + 1);
+                    Debug.LogWarningFormat("[Cubism] Missing ArtMesh name in modifier at \"{0}\" line {1}.", modifierPath, i + 1);
                     continue;
                 }
 
-                float alphaOverride;
+                Color tintMultiplier;
 
-                if (!float.TryParse(values[1].Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out alphaOverride))
+                if (!TryParseTintMultiplier(values[1].Trim(), out tintMultiplier))
                 {
-                    Debug.LogWarningFormat("[Cubism] Malformed AlphaOverride value at \"{0}\" line {1}: \"{2}\".", overridePath, i + 1, values[1].Trim());
+                    Debug.LogWarningFormat("[Cubism] Malformed TintMultiplier value at \"{0}\" line {1}: \"{2}\".", modifierPath, i + 1, values[1].Trim());
                     continue;
                 }
 
-                if (alphaOverride < 0f || alphaOverride > 1f)
-                {
-                    Debug.LogWarningFormat("[Cubism] AlphaOverride value at \"{0}\" line {1} is outside 0..1 and will be clamped: {2}.", overridePath, i + 1, alphaOverride);
-                }
-
-                overrides[artMeshName] = Mathf.Clamp01(alphaOverride);
+                modifiers[artMeshName] = tintMultiplier;
             }
 
-            return overrides;
+            return modifiers;
         }
 
-        private static bool IsArtMeshAlphaOverrideComment(string line)
+        private static bool TryParseTintMultiplier(string value, out Color tintMultiplier)
+        {
+            tintMultiplier = Color.white;
+
+            if (value.StartsWith("#"))
+            {
+                value = value.Substring(1);
+            }
+
+            if (value.Length <= 6)
+            {
+                return false;
+            }
+
+            var rgbHex = value.Substring(0, 6);
+            var alphaValue = value.Substring(6);
+
+            if (!ColorUtility.TryParseHtmlString("#" + rgbHex, out tintMultiplier))
+            {
+                return false;
+            }
+
+            float alpha;
+
+            if (!float.TryParse(alphaValue, NumberStyles.Float, CultureInfo.InvariantCulture, out alpha))
+            {
+                return false;
+            }
+
+            if (alpha < 0f || alpha > 1f)
+            {
+                return false;
+            }
+
+            tintMultiplier.a = alpha;
+
+            return true;
+        }
+
+        private static bool IsArtMeshModifierComment(string line)
         {
             return line.StartsWith(";") || line.StartsWith("#");
         }
