@@ -31,9 +31,9 @@ Example file content:
 ```csv
 ; ArtMeshName,TintMultiplier
 ; Only list ArtMeshes that need a modifier.
-ArtMesh15,FFFFFF1
-ArtMeshLight01,FFFFFF0.5
-ArtMeshGlowBody,FFD0D01
+ArtMesh15,FFFFFF255
+ArtMeshLight01,FFFFFF128
+ArtMeshGlowBody,FFD0D0255
 ```
 
 The importer reads this file from the model folder's parent folder during model import / prefab generation and applies the listed value only to the matching ArtMesh renderer on that prefab. On the first import, if the file does not exist yet, the importer should create a minimal template file automatically. If the file already exists, the importer must preserve it and never overwrite or append art-authored values.
@@ -58,22 +58,22 @@ ArtMeshName,TintMultiplier
 
 `TintMultiplier` should be stored on `CubismRenderer` and written to the renderer's material properties at runtime. It should not be treated as a global material value.
 
-The value format is 6-digit hex RGB followed by an alpha multiplier:
+The value format is 6-digit hex RGB followed by an alpha byte value:
 
 ```text
 RRGGBBAlpha
 ```
 
-The RGB section is copied directly from Unity's hex color field, which usually does not include alpha. The alpha section is a decimal value in `0..1` appended after the 6 RGB hex digits.
+The RGB section is copied directly from Unity's hex color field, which usually does not include alpha. The alpha section is a decimal integer in `0..255` appended after the 6 RGB hex digits, matching the usual byte-style color value range.
 
 ```text
-FFFFFF1 = original/default color and opacity
-FFFFFF0.5 = keep RGB, reduce opacity to 50%
-FFD0D01 = tint toward light red, keep opacity
-8080FF1 = reduce red/green, keep blue and opacity
+FFFFFF255 = original/default color and opacity
+FFFFFF128 = keep RGB, reduce opacity to about 50%
+FFD0D0255 = tint toward light red, keep opacity
+8080FF255 = reduce red/green, keep blue and opacity
 ```
 
-The default value is `FFFFFF1`. A value of `FFFFFF1` means normal/default tint for this ArtMesh. Only ArtMeshes listed in `{PrefabName}.ArtMeshModifier.txt` should receive a non-default author modifier. ArtMeshes not listed in the file remain at `FFFFFF1`.
+The default value is `FFFFFF255`. A value of `FFFFFF255` means normal/default tint for this ArtMesh. Only ArtMeshes listed in `{PrefabName}.ArtMeshModifier.txt` should receive a non-default author modifier. ArtMeshes not listed in the file remain at `FFFFFF255`.
 
 Important naming note: `TintMultiplier` is an RGB tint plus alpha multiplier for the ArtMesh, not a Gamma/Linear correction power and not a fixed replacement color. If future shader formulas need another curve or compensation value, use a different property name instead of changing this meaning.
 
@@ -127,7 +127,7 @@ Do not put this in `TryInitializeMesh()`. Mesh initialization can return early w
 6. Match `ArtMeshName` against the generated ArtMesh `GameObject.name`. In practice this should align with the ArtMesh name.
 7. Write `TintMultiplier` only to the matched `CubismRenderer`.
 8. Leave all unmatched ArtMeshes at the default value.
-9. Log warnings for malformed lines, malformed hex values, or missing ArtMesh names, but do not fail the import.
+9. Log warnings for malformed lines, malformed RGB hex values, malformed alpha byte values, or missing ArtMesh names, but do not fail the import.
 
 ## Why This Direction
 
