@@ -397,9 +397,9 @@ namespace Live2D.Cubism.Editor.Importers
             var builder = new StringBuilder();
             builder.AppendLine("; ArtMeshName,TintMultiplier");
             builder.AppendLine("; Only list ArtMeshes that need a modifier.");
-            builder.AppendLine("; Format: RRGGBBAlpha, for example FFFFFF1 or FFFFFF0.5.");
+            builder.AppendLine("; Format: RRGGBBAlpha, for example FFFFFF255 or FFFFFF128.");
             builder.AppendLine("; Example:");
-            builder.AppendLine("; ArtMeshGlowBody,FFFFFF0.8");
+            builder.AppendLine("; ArtMeshGlowBody,FFFFFF204");
 
             File.WriteAllText(modifierPath, builder.ToString(), Encoding.UTF8);
             AssetDatabase.ImportAsset(modifierPath);
@@ -471,19 +471,19 @@ namespace Live2D.Cubism.Editor.Importers
                 return false;
             }
 
-            float alpha;
+            int alpha;
 
-            if (!float.TryParse(alphaValue, NumberStyles.Float, CultureInfo.InvariantCulture, out alpha))
+            if (!int.TryParse(alphaValue, NumberStyles.Integer, CultureInfo.InvariantCulture, out alpha))
             {
                 return false;
             }
 
-            if (alpha < 0f || alpha > 1f)
+            if (alpha < 0 || alpha > 255)
             {
                 return false;
             }
 
-            tintMultiplier.a = alpha;
+            tintMultiplier.a = alpha / 255f;
 
             return true;
         }
